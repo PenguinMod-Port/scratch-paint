@@ -1,26 +1,26 @@
 import paper from '@turbowarp/paper';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import bindAll from 'lodash.bindall';
 import Modes from '../lib/modes';
-import {MIXED} from '../helper/style-path';
+import { MIXED } from '../helper/style-path';
 import ColorStyleProptype from '../lib/color-style-proptype';
 import GradientTypes from '../lib/gradient-types';
 
-import {changeFillColor, clearFillGradient, DEFAULT_COLOR} from '../reducers/fill-style';
-import {changeStrokeColor, clearStrokeGradient} from '../reducers/stroke-style';
-import {changeMode} from '../reducers/modes';
-import {clearSelectedItems, setSelectedItems} from '../reducers/selected-items';
-import {setCursor} from '../reducers/cursor';
-import {changeRoundedCornerSize} from '../reducers/rect-mode';
+import { changeFillColor, clearFillGradient, DEFAULT_COLOR } from '../reducers/fill-style';
+import { changeStrokeColor, clearStrokeGradient } from '../reducers/stroke-style';
+import { changeMode } from '../reducers/modes';
+import { clearSelectedItems, setSelectedItems } from '../reducers/selected-items';
+import { setCursor } from '../reducers/cursor';
+import { changeCurrentlySelectedShape } from '../reducers/sussy-mode';
 
-import {clearSelection, getSelectedLeafItems} from '../helper/selection';
-import RectTool from '../helper/tools/rect-tool';
-import RectModeComponent from '../components/rect-mode/rect-mode.jsx';
+import { clearSelection, getSelectedLeafItems } from '../helper/selection';
+import SussyTool from '../helper/tools/sussy-tool';
+import SussyModeComponent from '../components/sussy-mode/sussy-mode.jsx';
 
-class RectMode extends React.Component {
-    constructor (props) {
+class SussyMode extends React.Component {
+    constructor(props) {
         super(props);
         bindAll(this, [
             'activateTool',
@@ -28,59 +28,59 @@ class RectMode extends React.Component {
             'validateColorState'
         ]);
     }
-    componentDidMount () {
-        if (this.props.isRectModeActive) {
+    componentDidMount() {
+        if (this.props.isSussyModeActive) {
             this.activateTool(this.props);
         }
     }
-    componentWillReceiveProps (nextProps) {
+    componentWillReceiveProps(nextProps) {
         if (this.tool && nextProps.colorState !== this.props.colorState) {
             this.tool.setColorState(nextProps.colorState);
         }
         if (this.tool && nextProps.selectedItems !== this.props.selectedItems) {
             this.tool.onSelectionChanged(nextProps.selectedItems);
         }
-        if (this.tool && nextProps.roundedCornerSize !== this.props.roundedCornerSize) {
-            this.tool.setRoundedCornerSize(nextProps.roundedCornerSize);
+        if (this.tool && nextProps.shape !== this.props.shape) {
+            this.tool.setShape(nextProps.shape);
         }
 
-        if (nextProps.isRectModeActive && !this.props.isRectModeActive) {
+        if (nextProps.isSussyModeActive && !this.props.isSussyModeActive) {
             this.activateTool();
-        } else if (!nextProps.isRectModeActive && this.props.isRectModeActive) {
+        } else if (!nextProps.isSussyModeActive && this.props.isSussyModeActive) {
             this.deactivateTool();
         }
     }
-    shouldComponentUpdate (nextProps) {
-        return nextProps.isRectModeActive !== this.props.isRectModeActive;
+    shouldComponentUpdate(nextProps) {
+        return nextProps.isSussyModeActive !== this.props.isSussyModeActive;
     }
-    componentWillUnmount () {
+    componentWillUnmount() {
         if (this.tool) {
             this.deactivateTool();
         }
     }
-    activateTool () {
+    activateTool() {
         clearSelection(this.props.clearSelectedItems);
         this.validateColorState();
 
-        if (typeof this.props.roundedCornerSize !== "number") {
-            this.props.onChangeRoundedCornerSize(0);
+        if (!this.props.shape) {
+            this.props.onSetSelectedShape("smile");
         }
 
-        this.tool = new RectTool(
+        this.tool = new SussyTool(
             this.props.setSelectedItems,
             this.props.clearSelectedItems,
             this.props.setCursor,
             this.props.onUpdateImage
         );
-        this.tool.setRoundedCornerSize(this.props.roundedCornerSize);
         this.tool.setColorState(this.props.colorState);
+        this.tool.setShape(this.props.shape);
         this.tool.activate();
     }
-    validateColorState () { // TODO move to shared class
+    validateColorState() { // TODO move to shared class
         // Make sure that at least one of fill/stroke is set, and that MIXED is not one of the colors.
         // If fill and stroke color are both missing, set fill to default and stroke to transparent.
         // If exactly one of fill or stroke color is set, set the other one to transparent.
-        const {strokeWidth} = this.props.colorState;
+        const { strokeWidth } = this.props.colorState;
         const fillColor1 = this.props.colorState.fillColor.primary;
         let fillColor2 = this.props.colorState.fillColor.secondary;
         let fillGradient = this.props.colorState.fillColor.gradientType;
@@ -121,22 +121,22 @@ class RectMode extends React.Component {
             this.props.clearStrokeGradient();
         }
     }
-    deactivateTool () {
+    deactivateTool() {
         this.tool.deactivateTool();
         this.tool.remove();
         this.tool = null;
     }
-    render () {
+    render() {
         return (
-            <RectModeComponent
-                isSelected={this.props.isRectModeActive}
+            <SussyModeComponent
+                isSelected={this.props.isSussyModeActive}
                 onMouseDown={this.props.handleMouseDown}
             />
         );
     }
 }
 
-RectMode.propTypes = {
+SussyMode.propTypes = {
     clearFillGradient: PropTypes.func.isRequired,
     clearStrokeGradient: PropTypes.func.isRequired,
     clearSelectedItems: PropTypes.func.isRequired,
@@ -145,23 +145,23 @@ RectMode.propTypes = {
         strokeColor: ColorStyleProptype,
         strokeWidth: PropTypes.number
     }).isRequired,
+    shape: PropTypes.string.isRequired,
     handleMouseDown: PropTypes.func.isRequired,
-    isRectModeActive: PropTypes.bool.isRequired,
+    isSussyModeActive: PropTypes.bool.isRequired,
     onChangeFillColor: PropTypes.func.isRequired,
     onChangeStrokeColor: PropTypes.func.isRequired,
+    onSetSelectedShape: PropTypes.func.isRequired,
     onUpdateImage: PropTypes.func.isRequired,
     selectedItems: PropTypes.arrayOf(PropTypes.instanceOf(paper.Item)),
     setCursor: PropTypes.func.isRequired,
     setSelectedItems: PropTypes.func.isRequired,
-    roundedCornerSize: PropTypes.number.isRequired,
-    onChangeRoundedCornerSize: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
     colorState: state.scratchPaint.color,
-    isRectModeActive: state.scratchPaint.mode === Modes.RECT,
+    isSussyModeActive: state.scratchPaint.mode === Modes.SUSSY,
     selectedItems: state.scratchPaint.selectedItems,
-    roundedCornerSize: state.scratchPaint.rectMode.roundedCornerSize,
+    shape: state.scratchPaint.sussyMode.shape,
 });
 const mapDispatchToProps = dispatch => ({
     clearSelectedItems: () => {
@@ -180,7 +180,7 @@ const mapDispatchToProps = dispatch => ({
         dispatch(setCursor(cursorString));
     },
     handleMouseDown: () => {
-        dispatch(changeMode(Modes.RECT));
+        dispatch(changeMode(Modes.SUSSY));
     },
     onChangeFillColor: fillColor => {
         dispatch(changeFillColor(fillColor));
@@ -188,12 +188,12 @@ const mapDispatchToProps = dispatch => ({
     onChangeStrokeColor: strokeColor => {
         dispatch(changeStrokeColor(strokeColor));
     },
-    onChangeRoundedCornerSize: roundedCornerSize => {
-        dispatch(changeRoundedCornerSize(roundedCornerSize));
+    onSetSelectedShape: shape => {
+        dispatch(changeCurrentlySelectedShape(shape));
     }
 });
 
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(RectMode);
+)(SussyMode);

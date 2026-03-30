@@ -11,6 +11,11 @@ const messages = defineMessages({
         description: 'Label for the eraser tool',
         id: 'paint.eraserMode.eraser'
     },
+    pen: {
+        defaultMessage: 'Pen',
+        description: 'Label for the pen tool, which draws outlines',
+        id: 'paint.penMode.pen'
+    },
     fill: {
         defaultMessage: 'Fill',
         description: 'Label for the fill tool',
@@ -38,7 +43,7 @@ const messages = defineMessages({
     },
     roundedRect: {
         defaultMessage: 'Rounded Rectangle',
-        description: 'Label for the rounded rectangle tool',
+        description: 'Label for the rounded rectangle tool, which can be enabled with an addon',
         id: 'paint.roundedRectMode.roundedRect'
     },
     select: {

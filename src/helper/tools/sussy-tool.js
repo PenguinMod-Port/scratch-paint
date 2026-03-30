@@ -1,16 +1,17 @@
 import paper from '@turbowarp/paper';
 import Modes from '../../lib/modes';
-import {styleShape} from '../style-path';
-import {clearSelection} from '../selection';
-import {getSquareDimensions} from '../math';
+import { styleShape } from '../style-path';
+import { clearSelection } from '../selection';
+import { getSquareDimensions } from '../math';
 import BoundingBoxTool from '../selection-tools/bounding-box-tool';
 import NudgeTool from '../selection-tools/nudge-tool';
+import { selectablePaths } from '../selectable-shapes';
 
 /**
- * Tool for drawing rounded rectangles.
+ * Tool for drawing sussys.
  */
-class RoundedRectTool extends paper.Tool {
-    static get TOLERANCE () {
+class SussyTool extends paper.Tool {
+    static get TOLERANCE() {
         return 2;
     }
     /**
@@ -19,19 +20,19 @@ class RoundedRectTool extends paper.Tool {
      * @param {function} setCursor Callback to set the visible mouse cursor
      * @param {!function} onUpdateImage A callback to call when the image visibly changes
      */
-    constructor (setSelectedItems, clearSelectedItems, setCursor, onUpdateImage) {
+    constructor(setSelectedItems, clearSelectedItems, setCursor, onUpdateImage) {
         super();
         this.setSelectedItems = setSelectedItems;
         this.clearSelectedItems = clearSelectedItems;
         this.onUpdateImage = onUpdateImage;
         this.boundingBoxTool = new BoundingBoxTool(
-            Modes.ROUNDED_RECT,
+            Modes.SUSSY,
             setSelectedItems,
             clearSelectedItems,
             setCursor,
             onUpdateImage
         );
-        const nudgeTool = new NudgeTool(Modes.ROUNDED_RECT, this.boundingBoxTool, onUpdateImage);
+        const nudgeTool = new NudgeTool(Modes.SUSSY, this.boundingBoxTool, onUpdateImage);
 
         // We have to set these functions instead of just declaring them because
         // paper.js tools hook up the listeners in the setter functions.
@@ -42,14 +43,14 @@ class RoundedRectTool extends paper.Tool {
         this.onKeyUp = nudgeTool.onKeyUp;
         this.onKeyDown = nudgeTool.onKeyDown;
 
-        this.rect = null;
+        this.sussy = null;
         this.colorState = null;
         this.isBoundingBoxMode = null;
         this.active = false;
 
-        this.roundedCornerSize = 0;
+        this.shape = "smile";
     }
-    getHitOptions () {
+    getHitOptions() {
         return {
             segments: true,
             stroke: true,
@@ -59,34 +60,24 @@ class RoundedRectTool extends paper.Tool {
             match: hitResult =>
                 (hitResult.item.data && (hitResult.item.data.isScaleHandle || hitResult.item.data.isRotHandle)) ||
                 hitResult.item.selected, // Allow hits on bounding box and selected only
-            tolerance: RoundedRectTool.TOLERANCE / paper.view.zoom
+            tolerance: SussyTool.TOLERANCE / paper.view.zoom
         };
     }
     /**
      * Should be called if the selection changes to update the bounds of the bounding box.
      * @param {Array<paper.Item>} selectedItems Array of selected items.
      */
-    onSelectionChanged (selectedItems) {
+    onSelectionChanged(selectedItems) {
         this.boundingBoxTool.onSelectionChanged(selectedItems);
     }
-    setColorState (colorState) {
+    setColorState(colorState) {
         this.colorState = colorState;
     }
-    setRoundedCornerSize (newCornerSize) {
-        this.roundedCornerSize = newCornerSize;
-
-        // if editing a rect, update the curves
-        const oldRect = paper.project.selectedItems[0];
-        if (oldRect) {
-            const rounded = new paper.Path.Rectangle(oldRect.bounds, newCornerSize);
-            oldRect.segments = rounded.segments;
-            oldRect.closed = true;
-            rounded.remove();
-            this.setSelectedItems();
-            this.onUpdateImage();
-        }
+    setShape(shape) {
+        // NOTE: Purposefully not doing live updates here since users probably dont want that for this tool.
+        this.shape = shape;
     }
-    handleMouseDown (event) {
+    handleMouseDown(event) {
         if (event.event.button > 0) return; // only first mouse button
         this.active = true;
 
@@ -98,7 +89,7 @@ class RoundedRectTool extends paper.Tool {
             clearSelection(this.clearSelectedItems);
         }
     }
-    handleMouseDrag (event) {
+    handleMouseDrag(event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
 
         if (this.isBoundingBoxMode) {
@@ -106,29 +97,44 @@ class RoundedRectTool extends paper.Tool {
             return;
         }
 
-        if (this.rect) {
-            this.rect.remove();
-        }
+        if (this.sussy) this.sussy.remove();
 
-        const rect = new paper.Rectangle(event.downPoint, event.point);
-        const squareDimensions = getSquareDimensions(event.downPoint, event.point);
+        const rawBounds = new paper.Rectangle(event.downPoint, event.point);
+        const pathData = selectablePaths[this.shape];
+        this.sussy = new paper.CompoundPath(pathData);
+
+        const shapeBounds = this.sussy.bounds.clone();
+        const shapeRatio = shapeBounds.width / shapeBounds.height;
+        let finalBounds = rawBounds;
+
         if (event.modifiers.shift) {
-            rect.size = squareDimensions.size.abs();
+            const { width, height } = rawBounds.size;
+            let w0 = width, h0 = height;
+
+            // adjust to keep aspect ratio
+            if (width / height > shapeRatio) w0 = Math.sign(width) * Math.abs(height * shapeRatio);
+            else h0 = Math.sign(height) * Math.abs(width / shapeRatio);
+
+            const opposite = event.downPoint.add(new paper.Point(w0, h0));
+            finalBounds = new paper.Rectangle(
+                new paper.Point(
+                    Math.min(event.downPoint.x, opposite.x),
+                    Math.min(event.downPoint.y, opposite.y)
+                ),
+                new paper.Point(
+                    Math.max(event.downPoint.x, opposite.x),
+                    Math.max(event.downPoint.y, opposite.y)
+                )
+            );
         }
 
-        this.rect = new paper.Path.Rectangle(rect, this.roundedCornerSize === 0 ? null : this.roundedCornerSize);
-        if (event.modifiers.alt) {
-            this.rect.position = event.downPoint;
-        } else if (event.modifiers.shift) {
-            this.rect.position = squareDimensions.position;
-        } else {
-            const dimensions = event.point.subtract(event.downPoint);
-            this.rect.position = event.downPoint.add(dimensions.multiply(0.5));
-        }
+        this.sussy.bounds = finalBounds;
+        if (event.modifiers.alt) this.sussy.position = event.downPoint;
+        else this.sussy.position = this.sussy.bounds.center;
 
-        styleShape(this.rect, this.colorState);
+        styleShape(this.sussy, this.colorState);
     }
-    handleMouseUp (event) {
+    handleMouseUp(event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
 
         if (this.isBoundingBoxMode) {
@@ -137,26 +143,26 @@ class RoundedRectTool extends paper.Tool {
             return;
         }
 
-        if (this.rect) {
-            if (this.rect.area < RoundedRectTool.TOLERANCE / paper.view.zoom) {
-                // Tiny rectangle created unintentionally?
-                this.rect.remove();
-                this.rect = null;
+        if (this.sussy) {
+            if (Math.abs(this.sussy.area) < SussyTool.TOLERANCE / paper.view.zoom) {
+                // Tiny sussy created unintentionally?
+                this.sussy.remove();
+                this.sussy = null;
             } else {
-                this.rect.selected = true;
+                this.sussy.selected = true;
                 this.setSelectedItems();
                 this.onUpdateImage();
-                this.rect = null;
+                this.sussy = null;
             }
         }
         this.active = false;
     }
-    handleMouseMove (event) {
+    handleMouseMove(event) {
         this.boundingBoxTool.onMouseMove(event, this.getHitOptions());
     }
-    deactivateTool () {
+    deactivateTool() {
         this.boundingBoxTool.deactivateTool();
     }
 }
 
-export default RoundedRectTool;
+export default SussyTool;

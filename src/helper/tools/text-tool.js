@@ -49,10 +49,11 @@ class TextTool extends paper.Tool {
      * @param {!function} onUpdateImage A callback to call when the image visibly changes
      * @param {!function} setTextEditTarget Call to set text editing target whenever text editing is active
      * @param {!function} changeFont Call to change the font in the dropdown
+     * @param {!function} changeAlignment Call to change the current text alignment
      * @param {?boolean} isBitmap True if text should be rasterized once it's deselected
      */
     constructor (textAreaElement, setSelectedItems, clearSelectedItems, setCursor, onUpdateImage, setTextEditTarget,
-        changeFont, isBitmap) {
+        changeFont, changeAlignment, isBitmap) {
         super();
         this.element = textAreaElement;
         this.setSelectedItems = setSelectedItems;
@@ -60,6 +61,7 @@ class TextTool extends paper.Tool {
         this.onUpdateImage = onUpdateImage;
         this.setTextEditTarget = setTextEditTarget;
         this.changeFont = changeFont;
+        this.changeAlignment = changeAlignment;
         const paintMode = isBitmap ? Modes.BIT_TEXT : Modes.TEXT;
         this.boundingBoxTool = new BoundingBoxTool(
             paintMode,
@@ -145,6 +147,13 @@ class TextTool extends paper.Tool {
         this.element.style.fontFamily = font;
         this.setSelectedItems();
     }
+    setAlignment (alignment) {
+        this.alignment = alignment;
+        if (this.textBox) {
+            this.textBox.justification = alignment;
+        }
+        this.setSelectedItems();
+    }
     // Allow other tools to cancel text edit mode
     onTextEditCancelled () {
         if (this.mode !== TextTool.TEXT_EDIT_MODE) {
@@ -167,19 +176,14 @@ class TextTool extends paper.Tool {
         const textBoxMtx = this.textBox.matrix;
         const calculated = new paper.Matrix();
 
-        // In RTL, the element is moved relative to its parent's right edge instead of its left
-        // edge. We need to correct for this in order for the element to overlap the object in paper.
-        let tx = 0;
-        if (this.rtl && this.element.parentElement) {
-            tx = -this.element.parentElement.clientWidth;
-        }
         // The transform origin in paper is x at justification side, y at the baseline of the text.
         // The offset from (0, 0) to the upper left corner is recorded by internalBounds
         // (so this.textBox.internalBounds.y is negative).
         // Move the transform origin down to the text baseline to match paper
         this.element.style.transformOrigin = `${-this.textBox.internalBounds.x}px ${-this.textBox.internalBounds.y}px`;
+
         // Start by translating the element up so that its (0, 0) is now at the text baseline, like in paper
-        calculated.translate(tx, this.textBox.internalBounds.y);
+        calculated.translate(this.textBox.internalBounds.x, this.textBox.internalBounds.y);
         calculated.append(viewMtx);
         calculated.append(textBoxMtx);
         this.element.style.transform = `matrix(${calculated.a}, ${calculated.b}, ${calculated.c}, ${calculated.d},
@@ -187,10 +191,6 @@ class TextTool extends paper.Tool {
     }
     setColorState (colorState) {
         this.colorState = colorState;
-    }
-    /** @param {boolean} isRtl True if paint editor is in right-to-left layout (e.g. Hebrew language) */
-    setRtl (isRtl) {
-        this.rtl = isRtl;
     }
     handleMouseMove (event) {
         const hitResults = paper.project.hitTestAll(event.point, this.getTextEditHitOptions());
@@ -315,6 +315,7 @@ class TextTool extends paper.Tool {
         if (this.mode === TextTool.TEXT_EDIT_MODE) {
             this.textBox.content = this.element.value;
         }
+        if (this.alignment !== "left") this.calculateMatrix(paper.view.matrix);
         this.resizeGuide();
     }
     resizeGuide () {
@@ -324,11 +325,18 @@ class TextTool extends paper.Tool {
         // Prevent line from wrapping
         this.element.style.width = `${this.textBox.internalBounds.width + 1}px`;
         this.element.style.height = `${this.textBox.internalBounds.height}px`;
+        this.element.style.textAlign = "left";
+
         // The transform origin needs to be updated in RTL because this.textBox.internalBounds.x
         // changes as you type
-        if (this.rtl) {
+        if (this.alignment === "right") {
+            this.element.style.textAlign = "right";
             this.element.style.transformOrigin =
                 `${-this.textBox.internalBounds.x}px ${-this.textBox.internalBounds.y}px`;
+        }
+        if (this.alignment === "center") {  
+            this.element.style.textAlign = "center";
+            this.element.style.transformOrigin = `center ${-this.textBox.internalBounds.y}px`;
         }
     }
     beginSelect () {
@@ -352,6 +360,9 @@ class TextTool extends paper.Tool {
         if (this.font !== this.textBox.font) {
             this.changeFont(this.textBox.font);
         }
+        if (this.alignment !== this.textBox.justification) {
+            this.changeAlignment(this.textBox.justification);
+        }
         this.element.style.fontSize = `${this.textBox.fontSize}px`;
         this.element.style.lineHeight = this.textBox.leading / this.textBox.fontSize;
 
@@ -362,12 +373,7 @@ class TextTool extends paper.Tool {
         this.element.value = textBox.content ? textBox.content : '';
         this.calculateMatrix(paper.view.matrix);
 
-        if (this.rtl) {
-            // make both the textbox and the textarea element grow to the left
-            this.textBox.justification = 'right';
-        } else {
-            this.textBox.justification = 'left';
-        }
+        this.textBox.justification = this.alignment;
 
         this.element.focus({preventScroll: true});
         this.eventListener = this.handleTextInput.bind(this);

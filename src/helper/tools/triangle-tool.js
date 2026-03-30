@@ -1,16 +1,16 @@
 import paper from '@turbowarp/paper';
 import Modes from '../../lib/modes';
-import {styleShape} from '../style-path';
-import {clearSelection} from '../selection';
-import {getSquareDimensions} from '../math';
+import { styleShape } from '../style-path';
+import { clearSelection } from '../selection';
+import { getSquareDimensions } from '../math';
 import BoundingBoxTool from '../selection-tools/bounding-box-tool';
 import NudgeTool from '../selection-tools/nudge-tool';
 
 /**
- * Tool for drawing rounded rectangles.
+ * Tool for drawing triangles.
  */
-class RoundedRectTool extends paper.Tool {
-    static get TOLERANCE () {
+class TriangleTool extends paper.Tool {
+    static get TOLERANCE() {
         return 2;
     }
     /**
@@ -19,19 +19,19 @@ class RoundedRectTool extends paper.Tool {
      * @param {function} setCursor Callback to set the visible mouse cursor
      * @param {!function} onUpdateImage A callback to call when the image visibly changes
      */
-    constructor (setSelectedItems, clearSelectedItems, setCursor, onUpdateImage) {
+    constructor(setSelectedItems, clearSelectedItems, setCursor, onUpdateImage) {
         super();
         this.setSelectedItems = setSelectedItems;
         this.clearSelectedItems = clearSelectedItems;
         this.onUpdateImage = onUpdateImage;
         this.boundingBoxTool = new BoundingBoxTool(
-            Modes.ROUNDED_RECT,
+            Modes.TRIANGLE,
             setSelectedItems,
             clearSelectedItems,
             setCursor,
             onUpdateImage
         );
-        const nudgeTool = new NudgeTool(Modes.ROUNDED_RECT, this.boundingBoxTool, onUpdateImage);
+        const nudgeTool = new NudgeTool(Modes.TRIANGLE, this.boundingBoxTool, onUpdateImage);
 
         // We have to set these functions instead of just declaring them because
         // paper.js tools hook up the listeners in the setter functions.
@@ -42,14 +42,15 @@ class RoundedRectTool extends paper.Tool {
         this.onKeyUp = nudgeTool.onKeyUp;
         this.onKeyDown = nudgeTool.onKeyDown;
 
-        this.rect = null;
+        this.tri = null;
         this.colorState = null;
         this.isBoundingBoxMode = null;
         this.active = false;
 
-        this.roundedCornerSize = 0;
+        this.sideCount = 3;
+        this.pointCount = 1;
     }
-    getHitOptions () {
+    getHitOptions() {
         return {
             segments: true,
             stroke: true,
@@ -59,34 +60,56 @@ class RoundedRectTool extends paper.Tool {
             match: hitResult =>
                 (hitResult.item.data && (hitResult.item.data.isScaleHandle || hitResult.item.data.isRotHandle)) ||
                 hitResult.item.selected, // Allow hits on bounding box and selected only
-            tolerance: RoundedRectTool.TOLERANCE / paper.view.zoom
+            tolerance: TriangleTool.TOLERANCE / paper.view.zoom
         };
     }
     /**
      * Should be called if the selection changes to update the bounds of the bounding box.
      * @param {Array<paper.Item>} selectedItems Array of selected items.
      */
-    onSelectionChanged (selectedItems) {
+    onSelectionChanged(selectedItems) {
         this.boundingBoxTool.onSelectionChanged(selectedItems);
     }
-    setColorState (colorState) {
+    setColorState(colorState) {
         this.colorState = colorState;
     }
-    setRoundedCornerSize (newCornerSize) {
-        this.roundedCornerSize = newCornerSize;
+    setSideCount(sideCount) {
+        this.sideCount = sideCount;
+        this.updateExistingShape();
+    }
+    setPointCount(pointCount) {
+        this.pointCount = pointCount;
+        this.updateExistingShape();
+    }
+    calculateSegments() {
+        let segs = [];
 
-        // if editing a rect, update the curves
-        const oldRect = paper.project.selectedItems[0];
-        if (oldRect) {
-            const rounded = new paper.Path.Rectangle(oldRect.bounds, newCornerSize);
-            oldRect.segments = rounded.segments;
-            oldRect.closed = true;
-            rounded.remove();
+        for (let i = 0; i < this.sideCount; i++) {
+            let angle = (i / this.sideCount) * Math.PI * 2;
+            let angleIn = angle + (1 / this.sideCount) * Math.PI;
+
+            segs.push(new paper.Point(Math.sin(angle) * 50, -Math.cos(angle) * 50))
+            if (this.pointCount !== 1) {
+                segs.push(new paper.Point(Math.sin(angleIn) * 50 * this.pointCount, -Math.cos(angleIn) * 50 * this.pointCount));
+            }
+        }
+
+        return segs;
+    }
+    updateExistingShape() {
+        // if editing a tri, update the curves
+        const oldTri = paper.project.selectedItems[0];
+        if (oldTri) {
+            const path = new paper.Path({segments: this.calculateSegments(), closed: true});
+            path.bounds = oldTri.bounds;
+            oldTri.segments = path.segments;
+            oldTri.closed = true;
+            path.remove();
             this.setSelectedItems();
             this.onUpdateImage();
         }
     }
-    handleMouseDown (event) {
+    handleMouseDown(event) {
         if (event.event.button > 0) return; // only first mouse button
         this.active = true;
 
@@ -98,7 +121,7 @@ class RoundedRectTool extends paper.Tool {
             clearSelection(this.clearSelectedItems);
         }
     }
-    handleMouseDrag (event) {
+    handleMouseDrag(event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
 
         if (this.isBoundingBoxMode) {
@@ -106,29 +129,30 @@ class RoundedRectTool extends paper.Tool {
             return;
         }
 
-        if (this.rect) {
-            this.rect.remove();
+        if (this.tri) {
+            this.tri.remove();
         }
 
-        const rect = new paper.Rectangle(event.downPoint, event.point);
+        const bounds = new paper.Rectangle(event.downPoint, event.point);
         const squareDimensions = getSquareDimensions(event.downPoint, event.point);
         if (event.modifiers.shift) {
-            rect.size = squareDimensions.size.abs();
+            bounds.size = squareDimensions.size.abs();
         }
 
-        this.rect = new paper.Path.Rectangle(rect, this.roundedCornerSize === 0 ? null : this.roundedCornerSize);
+        this.tri = new paper.Path({segments: this.calculateSegments(), closed: true});
+        this.tri.bounds = bounds;
         if (event.modifiers.alt) {
-            this.rect.position = event.downPoint;
+            this.tri.position = event.downPoint;
         } else if (event.modifiers.shift) {
-            this.rect.position = squareDimensions.position;
+            this.tri.position = squareDimensions.position;
         } else {
             const dimensions = event.point.subtract(event.downPoint);
-            this.rect.position = event.downPoint.add(dimensions.multiply(0.5));
+            this.tri.position = event.downPoint.add(dimensions.multiply(0.5));
         }
 
-        styleShape(this.rect, this.colorState);
+        styleShape(this.tri, this.colorState);
     }
-    handleMouseUp (event) {
+    handleMouseUp(event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
 
         if (this.isBoundingBoxMode) {
@@ -137,26 +161,26 @@ class RoundedRectTool extends paper.Tool {
             return;
         }
 
-        if (this.rect) {
-            if (this.rect.area < RoundedRectTool.TOLERANCE / paper.view.zoom) {
-                // Tiny rectangle created unintentionally?
-                this.rect.remove();
-                this.rect = null;
+        if (this.tri) {
+            if (this.tri.area < TriangleTool.TOLERANCE / paper.view.zoom) {
+                // Tiny triangle created unintentionally?
+                this.tri.remove();
+                this.tri = null;
             } else {
-                this.rect.selected = true;
+                this.tri.selected = true;
                 this.setSelectedItems();
                 this.onUpdateImage();
-                this.rect = null;
+                this.tri = null;
             }
         }
         this.active = false;
     }
-    handleMouseMove (event) {
+    handleMouseMove(event) {
         this.boundingBoxTool.onMouseMove(event, this.getHitOptions());
     }
-    deactivateTool () {
+    deactivateTool() {
         this.boundingBoxTool.deactivateTool();
     }
 }
 
-export default RoundedRectTool;
+export default TriangleTool;
