@@ -10,6 +10,10 @@
     padding: calc(3 * $grid-unit);
 }
 
+.editor-container:fullscreen::backdrop {
+	background: var(--assets-background, #fff);
+}
+
 .row {
     display: flex;
     flex-direction: row;
@@ -218,4 +222,17 @@ $border-radius: 0.25rem;
 .button-text {
     width: 100%; /* Fixes button text wrapping in Edge */
     white-space: nowrap;
+}
+
+.fullscreen-button {
+    display: inline-block;
+    border: 1px solid var(--paint-ui-pane-border, #D9D9D9);
+    border-radius: 0.25rem;
+    padding: .35rem;
+    padding-bottom: calc(.35rem - 3px);
+    margin-left: auto;
+}
+
+.fullscreen-button img {
+    filter: $filter-icon-gray;
 }

@@ -91,12 +91,14 @@ class PaintEditor extends React.Component {
             'handleChangeTheme',
             'handleZoomIn',
             'handleZoomOut',
-            'handleZoomReset'
+            'handleZoomReset',
+            'handleToggleFullscreen'
         ]);
         this.state = {
             canvas: null,
             colorInfo: null
         };
+        this.containerRef = React.createRef();
         this.props.setLayout(this.props.rtl ? 'rtl' : 'ltr');
         this.props.onCustomFontsChanged(this.props.customFonts);
         if (this.props.settingsStore) this.props.onSettingsStoreChanged(this.props.settingsStore);
@@ -266,6 +268,15 @@ class PaintEditor extends React.Component {
     handleSetSelectedItems () {
         this.props.setSelectedItems(this.props.format);
     }
+    async handleToggleFullscreen() {
+        try {
+            if (document.fullscreenElement) {
+                await document.exitFullscreen();
+            } else {
+                await this.containerRef.current.requestFullscreen();
+            }
+        } catch (e) {console.log(e)}
+    }
     setCanvas (canvas) {
         this.setState({canvas: canvas});
         this.canvas = canvas;
@@ -342,6 +353,8 @@ class PaintEditor extends React.Component {
     render () {
         return (
             <PaintEditorComponent
+                containerRef={this.containerRef}
+
                 canRedo={this.props.shouldShowRedo}
                 canUndo={this.props.shouldShowUndo}
                 canvas={this.state.canvas}
@@ -366,6 +379,7 @@ class PaintEditor extends React.Component {
                 onRedo={this.props.onRedo}
                 onSwitchToBitmap={this.props.handleSwitchToBitmap}
                 onSwitchToVector={this.props.handleSwitchToVector}
+                onToggleFullscreen={this.handleToggleFullscreen}
                 onUndo={this.props.onUndo}
                 onUpdateImage={this.props.onUpdateImage}
                 onUpdateName={this.props.onUpdateName}

@@ -47,6 +47,8 @@ import zoomInIcon from './icons/zoom-in.svg';
 import zoomOutIcon from './icons/zoom-out.svg';
 import zoomResetIcon from './icons/zoom-reset.svg';
 import themeIcon from './icons/theme.svg';
+import fullscreenIcon from './icons/fullscreen.svg';
+import unfullscreenIcon from './icons/unfullscreen.svg';
 
 import MultiToolSelectComponent from '../multi-tool-select/multi-tool-select.jsx';
 import Modes from '../../lib/modes';
@@ -66,6 +68,7 @@ const messages = defineMessages({
 
 const PaintEditorComponent = props => (
     <div
+        ref={props.containerRef}
         className={styles.editorContainer}
         dir={props.rtl ? 'rtl' : 'ltr'}
         data-paint-theme={props.theme}
@@ -84,6 +87,12 @@ const PaintEditorComponent = props => (
                         onUpdateName={props.onUpdateName}
                         width={props.width}
                     />
+                    <Button
+                        className={styles.fullscreenButton}
+                        onClick={props.onToggleFullscreen}
+                    >
+                        <img src={fullscreenIcon} />
+                    </Button>
                 </div>
                 {/* Second Row */}
                 {isVector(props.format) ?
@@ -404,6 +413,7 @@ PaintEditorComponent.propTypes = {
     onRedo: PropTypes.func.isRequired,
     onSwitchToBitmap: PropTypes.func.isRequired,
     onSwitchToVector: PropTypes.func.isRequired,
+    onToggleFullscreen: PropTypes.func.isRequired,
     onUndo: PropTypes.func.isRequired,
     onUpdateImage: PropTypes.func.isRequired,
     onUpdateName: PropTypes.func.isRequired,
