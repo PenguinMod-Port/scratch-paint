@@ -6,6 +6,7 @@ import {MIXED, styleCursorPreview} from '../../helper/style-path';
 import {clearSelection, getItems} from '../../helper/selection';
 import {getGuideLayer, setGuideItem} from '../../helper/layer';
 import {isCompoundPathChild} from '../compound-path';
+import {getPenPressure} from '../../lib/pen';
 
 /**
  * Shared code for the brush and eraser mode. Adds functions on the paper tool object
@@ -99,12 +100,13 @@ class Blobbiness {
             if (event.event.button > 0) return; // only first mouse button
             this.active = true;
 
+            const pressureOptions = blob.getPressureOptions();
             if (blob.options.brushSize < Blobbiness.THRESHOLD) {
                 blob.brush = Blobbiness.BROAD;
-                blob.broadBrushHelper.onBroadMouseDown(event, blob.tool, blob.options);
+                blob.broadBrushHelper.onBroadMouseDown(event, blob.tool, pressureOptions);
             } else {
                 blob.brush = Blobbiness.SEGMENT;
-                blob.segmentBrushHelper.onSegmentMouseDown(event, blob.tool, blob.options);
+                blob.segmentBrushHelper.onSegmentMouseDown(event, blob.tool, pressureOptions);
             }
             blob.cursorPreview.bringToFront();
             blob.cursorPreview.position = event.point;
@@ -112,10 +114,11 @@ class Blobbiness {
 
         this.tool.onMouseDrag = function (event) {
             if (event.event.button > 0 || !this.active) return; // only first mouse button
+            const pressureOptions = blob.getPressureOptions();
             if (blob.brush === Blobbiness.BROAD) {
-                blob.broadBrushHelper.onBroadMouseDrag(event, blob.tool, blob.options);
+                blob.broadBrushHelper.onBroadMouseDrag(event, blob.tool, pressureOptions);
             } else if (blob.brush === Blobbiness.SEGMENT) {
-                blob.segmentBrushHelper.onSegmentMouseDrag(event, blob.tool, blob.options);
+                blob.segmentBrushHelper.onSegmentMouseDrag(event, blob.tool, pressureOptions);
             } else {
                 log.warn(`Brush type does not exist: ${blob.brush}`);
             }
@@ -127,11 +130,12 @@ class Blobbiness {
         this.tool.onMouseUp = function (event) {
             if (event.event.button > 0 || !this.active) return; // only first mouse button
 
+            const pressureOptions = blob.getPressureOptions();
             let lastPath;
             if (blob.brush === Blobbiness.BROAD) {
-                lastPath = blob.broadBrushHelper.onBroadMouseUp(event, blob.tool, blob.options);
+                lastPath = blob.broadBrushHelper.onBroadMouseUp(event, blob.tool, pressureOptions);
             } else if (blob.brush === Blobbiness.SEGMENT) {
-                lastPath = blob.segmentBrushHelper.onSegmentMouseUp(event, blob.tool, blob.options);
+                lastPath = blob.segmentBrushHelper.onSegmentMouseUp(event, blob.tool, pressureOptions);
             } else {
                 log.warn(`Brush type does not exist: ${blob.brush}`);
             }
@@ -153,6 +157,32 @@ class Blobbiness {
             this.active = false;
         };
         this.tool.activate();
+    }
+
+    /**
+     * Returns the drawing options to use for the current event, scaling the brush
+     * size by the pen pressure when drawing with a pen. This is what makes pen
+     * strokes vary in width as the pen is pressed harder or softer.
+     * @return {!object} options to pass to the brush helpers
+     */
+    getPressureOptions () {
+        if (!this.options) {
+            return this.options;
+        }
+        const pressure = getPenPressure();
+        if (pressure === null) {
+            return this.options;
+        }
+        // Browsers report pen pressure in 0..1. Map it so a firm press (>= 0.5)
+        // draws at the full brush size while lighter presses draw thinner, and
+        // always keep at least a quarter of the brush size so the stroke stays
+        // visible. Pens that don't support pressure report a constant 0.5, so
+        // this also keeps those strokes at full size.
+        const scale = Math.max(0.25, Math.min(1, pressure * 2));
+        return {
+            ...this.options,
+            brushSize: this.options.brushSize * scale
+        };
     }
 
     resizeCursorIfNeeded (point) {
