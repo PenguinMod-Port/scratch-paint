@@ -109,14 +109,14 @@ class PaperCanvas extends React.Component {
         paper.remove();
     }
     handlePointerDown (event) {
-        if (event.pointerType === 'pen') {
+        if (event.pointerType === 'pen' && (!this.props.settingsStore || this.props.settingsStore.store.paintPenPressure === true)) {
             setPenPressure(event.pressure);
         } else {
             setPenPressure(null);
         }
     }
     handlePointerMove (event) {
-        if (event.pointerType === 'pen') {
+        if (event.pointerType === 'pen' && (!this.props.settingsStore || this.props.settingsStore.store.paintPenPressure === true)) {
             setPenPressure(event.pressure);
         } else {
             setPenPressure(null);
@@ -421,13 +421,15 @@ PaperCanvas.propTypes = {
     zoomLevelId: PropTypes.string,
     zoomLevels: PropTypes.shape({
         currentZoomLevelId: PropTypes.string
-    })
+    }),
+    settingsStore: PropTypes.object
 };
 const mapStateToProps = state => ({
     mode: state.scratchPaint.mode,
     cursor: state.scratchPaint.cursor,
     format: state.scratchPaint.format,
-    zoomLevels: state.scratchPaint.zoomLevels
+    zoomLevels: state.scratchPaint.zoomLevels,
+    settingsStore: state.scratchPaint.settingsStore
 });
 const mapDispatchToProps = dispatch => ({
     undoSnapshot: snapshot => {
