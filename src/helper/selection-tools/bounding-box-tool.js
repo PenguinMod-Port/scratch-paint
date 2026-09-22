@@ -67,6 +67,7 @@ class BoundingBoxTool {
      */
     onSelectionChanged (selectedItems) {
         if (selectedItems && selectedItems.length) {
+            this.anchorPosition = null;
             this.setSelectionBounds();
         } else {
             this.removeBoundsPath();
