@@ -149,6 +149,7 @@ class ScaleTool {
             return;
         }
         this.boundsPath.remove();
+        this.boundsPath.selectionAnchor.remove();
         this.boundsPath = null;
         
         // mark text items as scaled (for later use on font size calc)

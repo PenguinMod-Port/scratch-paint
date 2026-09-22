@@ -26,6 +26,7 @@ class MoveTool {
      */
     constructor (mode, setSelectedItems, clearSelectedItems, onUpdateImage, switchToTextTool) {
         this.mode = mode;
+        this.anchorPosition = null;
         this.setSelectedItems = setSelectedItems;
         this.clearSelectedItems = clearSelectedItems;
         this.selectedItems = null;
@@ -45,7 +46,8 @@ class MoveTool {
      * @param {?boolean} hitProperties.subselect True if we allow selection of subgroups, false if we should
      *     select the whole group.
      */
-    onMouseDown (hitProperties) {
+    onMouseDown (hitProperties, anchorPosition) {
+        this.anchorPosition = anchorPosition;
         let item = hitProperties.hitResult.item;
         if (!hitProperties.subselect) {
             const root = getRootItem(hitProperties.hitResult.item);
@@ -88,10 +90,11 @@ class MoveTool {
                 selectionBounds = selectedItem.bounds;
             }
         }
-        this.selectionCenter = selectionBounds.center;
+        this.selectionCenter = anchorPosition.clone();
 
         if (this.boundsPath) {
             this.selectedItems.push(this.boundsPath);
+            this.selectedItems.push(this.boundsPath.selectionAnchor);
         }
 
         this.firstDrag = true;
@@ -146,6 +149,7 @@ class MoveTool {
             return;
         }
 
+        const resultingMovement = snapVector || (event.modifiers.shift ? snapDeltaToAngle(dragVector, Math.PI / 4) : dragVector);
         let bounds;
         for (const item of this.selectedItems) {
             // add the position of the item before the drag started
@@ -154,13 +158,7 @@ class MoveTool {
                 item.data.origPos = item.position;
             }
 
-            if (snapVector) {
-                item.position = item.data.origPos.add(snapVector);
-            } else if (event.modifiers.shift) {
-                item.position = item.data.origPos.add(snapDeltaToAngle(dragVector, Math.PI / 4));
-            } else {
-                item.position = item.data.origPos.add(dragVector);
-            }
+            item.position = item.data.origPos.add(resultingMovement);
 
             if (bounds) {
                 bounds = bounds.unite(item.bounds);
@@ -168,6 +166,7 @@ class MoveTool {
                 bounds = item.bounds;
             }
         }
+        this.anchorPosition.set(this.selectionCenter.add(resultingMovement));
 
         if (this.firstDrag) {
             // Show the center crosshair above the selected item while dragging.

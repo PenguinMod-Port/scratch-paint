@@ -19,8 +19,8 @@ class RotateTool {
      * @param {!object} boundsPath Where the boundaries of the hit item are
      * @param {!Array.<paper.Item>} selectedItems Set of selected paper.Items
      */
-    onMouseDown (hitResult, boundsPath, selectedItems) {
-        this.rotGroupPivot = boundsPath.bounds.center;
+    onMouseDown (selectedItems, anchorPosition) {
+        this.rotGroupPivot = anchorPosition;
         for (const item of selectedItems) {
             // Rotate only root items
             if (item.parent instanceof paper.Layer) {
