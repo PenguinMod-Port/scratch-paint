@@ -27,6 +27,7 @@ class ScaleTool {
         // Lowest item above all scale items in z index
         this.itemToInsertBelow = null;
         this.lastPoint = null;
+        this.anchorPosition = null;
         this.onUpdateImage = onUpdateImage;
     }
 
@@ -35,9 +36,11 @@ class ScaleTool {
      * @param {!object} boundsPath Where the boundaries of the hit item are
      * @param {!Array.<paper.Item>} selectedItems Set of selected paper.Items
      */
-    onMouseDown (hitResult, boundsPath, selectedItems) {
+    onMouseDown (hitResult, boundsPath, anchorCrosshair, anchorPosition, selectedItems) {
         if (this.active) return;
         this.active = true;
+
+        this.anchorPosition = anchorPosition;
 
         const index = hitResult.item.data.index;
         this.pivot = boundsPath.bounds[this._getOpposingRectCornerNameByIndex(index)].clone();
@@ -70,6 +73,7 @@ class ScaleTool {
 
         this.itemGroup = new paper.Group(selectedItems);
         this.itemGroup.addChild(boundsPath);
+        this.itemGroup.addChild(anchorCrosshair);
         this.itemGroup.insertBelow(this.itemToInsertBelow);
         this.itemGroup.data.isHelperItem = true;
     }
@@ -135,6 +139,8 @@ class ScaleTool {
     onMouseUp () {
         if (!this.active) return;
         this.lastPoint = null;
+
+        this.anchorPosition.set(this.anchorPosition.subtract(this.pivot).multiply(this.lastSx, this.lastSy).add(this.pivot));
 
         this.pivot = null;
         this.origPivot = null;
