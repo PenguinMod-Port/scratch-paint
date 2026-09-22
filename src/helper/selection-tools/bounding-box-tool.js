@@ -108,7 +108,7 @@ class BoundingBoxTool {
             this.removeBoundsHandles();
         } else if (this.mode === BoundingBoxModes.ROTATE) {
             this.setCursor(Cursors.GRABBING);
-            this._modeMap[this.mode].onMouseDown(getSelectedRootItems(), this.anchorPosition);
+            this._modeMap[this.mode].onMouseDown(event, getSelectedRootItems(), this.anchorPosition);
             // While transforming, don't show bounds
             this.removeBoundsPath();
         } else if (this.mode === BoundingBoxModes.REPIVOT) {

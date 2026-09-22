@@ -19,7 +19,7 @@ class RotateTool {
      * @param {!object} boundsPath Where the boundaries of the hit item are
      * @param {!Array.<paper.Item>} selectedItems Set of selected paper.Items
      */
-    onMouseDown (selectedItems, anchorPosition) {
+    onMouseDown (event, selectedItems, anchorPosition) {
         this.rotGroupPivot = anchorPosition;
         for (const item of selectedItems) {
             // Rotate only root items
@@ -27,7 +27,7 @@ class RotateTool {
                 this.rotItems.push(item);
             }
         }
-        this.prevRot = 90;
+        this.prevRot = (event.point.subtract(this.rotGroupPivot)).angle;
     }
     onMouseDrag (event) {
         let rotAngle = (event.point.subtract(this.rotGroupPivot)).angle;
