@@ -90,7 +90,7 @@ class MoveTool {
                 selectionBounds = selectedItem.bounds;
             }
         }
-        this.selectionCenter = anchorPosition.clone();
+        this.selectionCenter = anchorPosition ? anchorPosition.clone() : selectionBounds;
 
         if (this.boundsPath) {
             this.selectedItems.push(this.boundsPath);
@@ -212,6 +212,7 @@ class MoveTool {
         }
         this.selectedItems = null;
         this.selectionCenter = null;
+        this.anchorPosition = null;
 
         if (moved) {
             this.onUpdateImage();

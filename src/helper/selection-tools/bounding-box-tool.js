@@ -273,7 +273,7 @@ class BoundingBoxTool {
 
         this.anchorCrosshair.scale(
             SELECTION_ANCHOR_SIZE / paper.view.zoom / this.anchorCrosshair.bounds.width);
-        this.anchorCrosshair.position = this.anchorPosition;
+        this.anchorCrosshair.position = this.anchorPosition.clone();
         this.anchorCrosshair.strokeWidth = 1 / paper.view.zoom;
         this.anchorCrosshair.strokeColor = getGuideColor();
 
