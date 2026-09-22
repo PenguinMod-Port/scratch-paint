@@ -55,7 +55,7 @@ class RectTool extends paper.Tool {
             fill: true,
             guide: false,
             match: hitResult =>
-                (hitResult.item.data && (hitResult.item.data.isScaleHandle || hitResult.item.data.isRotHandle)) ||
+                (hitResult.item.data && (hitResult.item.data.isScaleHandle || hitResult.item.data.isRotHandle || hitResult.item.data.isPivotAnchor)) ||
                 hitResult.item.selected, // Allow hits on bounding box and selected only
             tolerance: RectTool.TOLERANCE / paper.view.zoom
         };
