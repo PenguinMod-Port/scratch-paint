@@ -11,6 +11,7 @@ class RotateTool {
         this.rotItems = [];
         this.rotGroupPivot = null;
         this.prevRot = 90;
+        this.inSnappedAngles = false;
         this.onUpdateImage = onUpdateImage;
     }
 
@@ -33,7 +34,11 @@ class RotateTool {
         let rotAngle = (event.point.subtract(this.rotGroupPivot)).angle;
         if (event.modifiers.shift) {
             rotAngle = Math.round(rotAngle / 45) * 45;
+            // ensure that we have a difference of ZERO when we enter
+            if (!this.inSnappedAngles)
+                this.prevRot = rotAngle;
         }
+        this.inSnappedAngles = event.modifiers.shift;
 
         for (let i = 0; i < this.rotItems.length; i++) {
             const item = this.rotItems[i];
