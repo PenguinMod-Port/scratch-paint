@@ -112,7 +112,7 @@ class BoundingBoxTool {
             // While transforming, don't show bounds
             this.removeBoundsPath();
         } else if (this.mode === BoundingBoxModes.REPIVOT) {
-            this._modeMap[this.mode].onMouseDown(hitProperties, this.boundsPath, this.anchorCrosshair, this.anchorPosition);
+            this._modeMap[this.mode].onMouseDown(hitProperties, this.boundsPath, this.boundsPath.selectionAnchor, this.anchorPosition);
             this.removeBoundsHandles();
         }
 
@@ -228,7 +228,7 @@ class BoundingBoxTool {
 
             const anchorSelectionCircle =
                 new paper.Path.Circle({
-                    center: new paper.Point(0, 0),
+                    center: new paper.Point(0,0),
                     radius: 7,
                     fillColor: '#009dec10',
                     data: {
@@ -273,9 +273,9 @@ class BoundingBoxTool {
         this.boundsPath.strokeWidth = 1 / paper.view.zoom;
         this.boundsPath.strokeColor = getGuideColor();
 
-        this.anchorCrosshair.scale(
+        this.boundsPath.selectionAnchor.scale(
             SELECTION_ANCHOR_SIZE / paper.view.zoom / this.anchorCrosshair.bounds.width);
-        this.anchorCrosshair.position = this.anchorPosition.clone();
+        this.boundsPath.selectionAnchor.position = this.anchorPosition.clone();
         this.anchorCrosshair.strokeWidth = 1 / paper.view.zoom;
         this.anchorCrosshair.strokeColor = getGuideColor();
 
