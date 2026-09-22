@@ -31,6 +31,7 @@ class MoveTool {
         this.clearSelectedItems = clearSelectedItems;
         this.selectedItems = null;
         this.selectionCenter = null;
+        this.trueCenter = null;
         this.onUpdateImage = onUpdateImage;
         this.switchToTextTool = switchToTextTool;
         this.boundsPath = null;
@@ -47,7 +48,7 @@ class MoveTool {
      *     select the whole group.
      */
     onMouseDown (hitProperties, anchorPosition) {
-        this.anchorPosition = anchorPosition;
+        let relativeCenter;
         let item = hitProperties.hitResult.item;
         if (!hitProperties.subselect) {
             const root = getRootItem(hitProperties.hitResult.item);
@@ -69,6 +70,8 @@ class MoveTool {
                 this._select(item, false /* state */, hitProperties.subselect);
             }
         } else {
+            if (this.selectionCenter)
+                relativeCenter = this.selectionCenter.subtract(this.trueCenter);
             // deselect all by default if multiselect isn't on
             if (!hitProperties.multiselect) {
                 clearSelection(this.clearSelectedItems);
@@ -90,7 +93,9 @@ class MoveTool {
                 selectionBounds = selectedItem.bounds;
             }
         }
-        this.selectionCenter = anchorPosition ? anchorPosition.clone() : selectionBounds;
+        if (this.anchorPosition && relativeCenter) this.anchorPosition.set(relativeCenter.add(selectionBounds.center));
+        this.selectionCenter = this.anchorPosition ? this.anchorPosition.clone() : selectionBounds.center;
+        this.trueCenter = selectionBounds.center;
 
         if (this.boundsPath) {
             this.selectedItems.push(this.boundsPath);
@@ -99,8 +104,11 @@ class MoveTool {
 
         this.firstDrag = true;
     }
-    setBoundsPath (boundsPath) {
+    setBoundsPath (boundsPath, anchorPosition) {
         this.boundsPath = boundsPath;
+
+        this.anchorPosition = anchorPosition;
+        this.selectionCenter = anchorPosition.clone();
     }
     /**
      * Sets the selection state of an item.
@@ -212,7 +220,6 @@ class MoveTool {
         }
         this.selectedItems = null;
         this.selectionCenter = null;
-        this.anchorPosition = null;
 
         if (moved) {
             this.onUpdateImage();

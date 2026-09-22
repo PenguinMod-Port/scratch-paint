@@ -49,6 +49,7 @@ class BoundingBoxTool {
         this.mode = null;
         this.boundsPath = null;
         this.anchorCrosshair = null;
+        this.anchorPosition = null;
         this.boundsScaleHandles = [];
         this.boundsRotHandles = [];
         this._modeMap = {};
@@ -213,7 +214,21 @@ class BoundingBoxTool {
                 rect = item.bounds;
             }
         }
-        this.anchorPosition ||= rect.center;
+        this.anchorPosition ||= rect.center.clone();
+        // if (!this.anchorPosition.tampered) {
+        //     delete this.anchorPosition.x;
+        //     Object.defineProperty(this.anchorPosition, 'x', {
+        //         get() {
+        //             console.log(new Error(''));
+        //             return this._x;
+        //         },
+        //         set(v) {
+        //             this._x = v;
+        //             this._owner[this._setter](this);
+        //         }
+        //     });
+        //     this.anchorPosition.tampered = true;
+        // }
 
         if (!this.boundsPath) {
             this.boundsPath = new paper.Group();
@@ -261,7 +276,7 @@ class BoundingBoxTool {
             anchorIcon.parent = getGuideLayer();
             this.boundsPath.selectionAnchor = anchorIcon;
 
-            this._modeMap[BoundingBoxModes.MOVE].setBoundsPath(this.boundsPath);
+            this._modeMap[BoundingBoxModes.MOVE].setBoundsPath(this.boundsPath, this.anchorPosition);
         }
         setGuideItem(this.boundsPath);
         this.boundsPath.data.isSelectionBound = true;
