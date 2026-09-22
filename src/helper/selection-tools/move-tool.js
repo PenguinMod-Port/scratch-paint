@@ -175,7 +175,8 @@ class MoveTool {
                 bounds = item.bounds;
             }
         }
-        this.anchorPosition.set(this.selectionCenter.add(resultingMovement));
+        if (this.anchorPosition)
+            this.anchorPosition.set(this.selectionCenter.add(resultingMovement));
 
         if (this.firstDrag) {
             // Show the center crosshair above the selected item while dragging.
