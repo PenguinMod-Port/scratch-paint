@@ -70,8 +70,9 @@ class MoveTool {
                 this._select(item, false /* state */, hitProperties.subselect);
             }
         } else {
-            if (this.selectionCenter)
-                relativeCenter = this.selectionCenter.subtract(this.trueCenter);
+            // if (this.selectionCenter)
+            //     relativeCenter = this.selectionCenter.subtract(this.trueCenter);
+            relativeCenter = new paper.Point(0,0);
             // deselect all by default if multiselect isn't on
             if (!hitProperties.multiselect) {
                 clearSelection(this.clearSelectedItems);

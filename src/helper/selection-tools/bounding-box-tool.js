@@ -87,6 +87,7 @@ class BoundingBoxTool {
         const {hitResult, mode} = this._determineMode(event, multiselect, hitOptions);
         if (!hitResult) {
             if (!multiselect) {
+                this.anchorPosition = null; // see also ./move-tool.js L73-74
                 this.removeBoundsPath();
             }
             return false;
@@ -215,20 +216,6 @@ class BoundingBoxTool {
             }
         }
         this.anchorPosition ||= rect.center.clone();
-        // if (!this.anchorPosition.tampered) {
-        //     delete this.anchorPosition.x;
-        //     Object.defineProperty(this.anchorPosition, 'x', {
-        //         get() {
-        //             console.log(new Error(''));
-        //             return this._x;
-        //         },
-        //         set(v) {
-        //             this._x = v;
-        //             this._owner[this._setter](this);
-        //         }
-        //     });
-        //     this.anchorPosition.tampered = true;
-        // }
 
         if (!this.boundsPath) {
             this.boundsPath = new paper.Group();
