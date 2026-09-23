@@ -1,4 +1,5 @@
 @import "../../css/colors.css";
+@import "../../css/filters.css";
 
 .layers-container {
     width: 308px;
@@ -8,14 +9,14 @@
     padding: 8px;
     box-sizing: border-box;
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
     gap: 4px;
     overflow: auto;
 }
 
 .layer {
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
     gap: 4px;
 }
 
@@ -28,6 +29,10 @@
     transition: 0.1s ease;
     padding: 8px;
     cursor: pointer;
+}
+
+.layer > .info img {
+    filter: $filter-icon-gray;
 }
 
 .layer > .info input {

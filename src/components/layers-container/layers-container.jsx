@@ -17,11 +17,13 @@ import placeholderImage from '../rect-mode/rectangle.svg';
 const iconMap = new Map([
     ["Group", require('./icons/group.svg')],
     ["Path", require('./icons/path.svg')],
-    ["PointText", require('./icons/text.svg')]
+    ["PointText", require('./icons/text.svg')],
+    ["Raster", require('./icons/bitmap.svg')]
 ])
 
 const nameMap = new Map([
-    ["PointText", "Text"]
+    ["PointText", "Text"],
+    ["Raster", "Bitmap"]
 ])
 
 class LayersContainer extends React.Component {
@@ -45,7 +47,6 @@ class LayersContainer extends React.Component {
 
     renderLayer (layer) {
         return (<div key={layer.id} className={classNames(styles.layer, {[styles.active]: this.isSelected(layer)})}>
-            {(layer.getChildren() || []).map(this.renderLayer)}
             <div className={styles.info} onClick={() => this.selectLayer(layer)}>
                 <img alt="" src={iconMap.get(layer.className) ?? placeholderImage} />
                 <BufferedInput
@@ -55,6 +56,7 @@ class LayersContainer extends React.Component {
                     onSubmit={e => this.setLayerName(layer, e.target.value)}
                 />
             </div>
+            {(layer.getChildren() || []).toReversed().map(this.renderLayer)}
         </div>);
     }
 
@@ -77,7 +79,7 @@ class LayersContainer extends React.Component {
     render () {
         return (
             <div className={styles.layersContainer}>
-                {paper.project && this.topLevelLayers().map(this.renderLayer)}
+                {paper.project && this.topLevelLayers().toReversed().map(this.renderLayer)}
             </div>
         );
     }
