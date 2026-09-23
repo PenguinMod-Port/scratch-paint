@@ -52,6 +52,7 @@ import unfullscreenIcon from './icons/unfullscreen.svg';
 
 import MultiToolSelectComponent from '../multi-tool-select/multi-tool-select.jsx';
 import Modes from '../../lib/modes';
+import LayersContainer from '../layers-container/layers-container.jsx';
 
 const messages = defineMessages({
     bitmap: {
@@ -389,6 +390,7 @@ const PaintEditorComponent = props => (
                     </InputGroup>
                 </div>
             </div>
+            {isVector(props.format) && <LayersContainer />}
         </div>
     </div>
 );
