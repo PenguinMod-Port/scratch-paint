@@ -113,6 +113,7 @@ class BoundingBoxTool {
             // While transforming, don't show bounds
             this.removeBoundsPath();
         } else if (this.mode === BoundingBoxModes.REPIVOT) {
+            this.setCursor(Cursors.GRABBING);
             this._modeMap[this.mode].onMouseDown(hitProperties, this.boundsPath, this.boundsPath.selectionAnchor, this.anchorPosition);
             this.removeBoundsHandles();
         }
@@ -143,6 +144,8 @@ class BoundingBoxTool {
                 } else {
                     this.setCursor(Cursors.RESIZE_NWSE);
                 }
+            } else if (mode === BoundingBoxModes.REPIVOT) {
+                this.setCursor(Cursors.GRAB);
             }
         } else {
             this.setCursor(Cursors.DEFAULT);
