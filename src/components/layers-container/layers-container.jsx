@@ -7,6 +7,10 @@ import paper from '@turbowarp/paper';
 import {setSelectedItems} from '../../reducers/selected-items';
 import {getSelectedLeafItems, setItemSelection} from '../../helper/selection';
 
+import BufferedInputHOC from '../forms/buffered-input-hoc.jsx';
+import Input from '../forms/input.jsx';
+const BufferedInput = BufferedInputHOC(Input);
+
 import styles from './layers-container.css';
 import placeholderImage from '../rect-mode/rectangle.svg';
 
@@ -17,6 +21,7 @@ class LayersContainer extends React.Component {
             'isSelected',
             'renderLayer',
             'selectLayer',
+            'setLayerName',
             'topLevelLayers'
         ]);
     }
@@ -29,12 +34,17 @@ class LayersContainer extends React.Component {
     }
 
     renderLayer (layer) {
-        return (<div className={classNames(styles.layer, {[styles.active]: this.isSelected(layer)})}>
+        return (<div key={layer.id} className={classNames(styles.layer, {[styles.active]: this.isSelected(layer)})}>
+            {(layer.getChildren() || []).map(this.renderLayer)}
             <div className={styles.info} onClick={() => this.selectLayer(layer)}>
                 <img alt="" src={placeholderImage} />
-                <span>{layer.name ?? <i>{layer.className}</i>}</span>
+                <BufferedInput
+                    type="text"
+                    placeholder={layer.className}
+                    value={layer.name}
+                    onSubmit={e => this.setLayerName(layer, e.target.value)}
+                />
             </div>
-            {(layer.getChildren() || []).map(this.renderLayer)}
         </div>);
     }
 
@@ -42,6 +52,10 @@ class LayersContainer extends React.Component {
         paper.project.deselectAll();
         setItemSelection(layer, true);
         this.props.setSelectedItems();
+    }
+
+    setLayerName (layer, name) {
+        layer.name = name;
     }
 
     topLevelLayers () {
@@ -54,36 +68,6 @@ class LayersContainer extends React.Component {
         return (
             <div className={styles.layersContainer}>
                 {paper.project && this.topLevelLayers().map(this.renderLayer)}
-                {/*<div className={styles.layer}>
-                    <div className={styles.info}>
-                        <img alt="" src={placeholderImage} />
-                        <span>Layer</span>
-                    </div>
-                </div>
-                <div className={classNames(styles.layer, styles.active)}>
-                    <div className={styles.info}>
-                        <img alt="" src={placeholderImage} />
-                        <span>Layer</span>
-                    </div>
-                </div>
-                <div className={styles.layer}>
-                    <div className={styles.info}>
-                        <img alt="" src={placeholderImage} />
-                        <span>Group</span>
-                    </div>
-                    <div className={styles.layer}>
-                        <div className={styles.info}>
-                            <img alt="" src={placeholderImage} />
-                            <span>Layer</span>
-                        </div>
-                    </div>
-                    <div className={styles.layer}>
-                        <div className={styles.info}>
-                            <img alt="" src={placeholderImage} />
-                            <span>Layer</span>
-                        </div>
-                    </div>
-                </div>*/}
             </div>
         );
     }
