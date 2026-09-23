@@ -47,7 +47,7 @@ class LayersContainer extends React.Component {
 
     renderLayer (layer) {
         return (<div key={layer.id} className={classNames(styles.layer, {[styles.active]: this.isSelected(layer)})}>
-            <div className={styles.info} onClick={() => this.selectLayer(layer)}>
+            <div className={styles.info} onClick={(e) => this.selectLayer(layer, e)}>
                 <img alt="" src={iconMap.get(layer.className) ?? placeholderImage} />
                 <BufferedInput
                     type="text"
@@ -60,9 +60,10 @@ class LayersContainer extends React.Component {
         </div>);
     }
 
-    selectLayer (layer) {
-        paper.project.deselectAll();
-        setItemSelection(layer, true);
+    selectLayer (layer, event) {
+        let alreadySelected = paper.project.selectedItems.includes(layer);
+        if (!event.ctrlKey) paper.project.deselectAll();
+        setItemSelection(layer, !alreadySelected);
         this.props.setSelectedItems();
     }
 
