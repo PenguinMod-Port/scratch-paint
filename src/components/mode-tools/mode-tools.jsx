@@ -8,6 +8,7 @@ import {changeBrushSize as changeEraserSize} from '../../reducers/eraser-mode';
 import {changeBitBrushSize} from '../../reducers/bit-brush-size';
 import {changeBitEraserSize} from '../../reducers/bit-eraser-size';
 import {setShapesFilled} from '../../reducers/fill-bitmap-shapes';
+import {changeSimplifySize} from '../../reducers/freeform-mode';
 
 import FontDropdown from '../../containers/font-dropdown.jsx';
 import LiveInputHOC from '../forms/live-input-hoc.jsx';
@@ -103,7 +104,12 @@ const ModeToolsComponent = props => {
             defaultMessage: 'Outlined',
             description: 'Label for the button that sets the bitmap rectangle/oval mode to draw filled-in shapes',
             id: 'paint.modeTools.outlined'
-        }
+        },
+        freeformSimplify: {
+            defaultMessage: 'Smoothing',
+            description: 'Label for the freeform smoothing input',
+            id: 'paint.modeTools.freeformSimplify'
+        },
     });
 
     switch (props.mode) {
@@ -301,6 +307,26 @@ const ModeToolsComponent = props => {
             </div>
         );
     }
+    case Modes.FREEFORM:
+    {
+        const currentFreeformSimplifyValue = props.freeformValue;
+        const changeFunctionSimplify = props.onSimplifySliderChange;
+        return (
+            <div className={classNames(props.className, styles.modeTools)}>
+                <Label text={props.intl.formatMessage(messages.freeformSimplify)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
+                    <LiveInput
+                        range
+                        small
+                        max={1000}
+                        min="0"
+                        type="number"
+                        value={currentFreeformSimplifyValue}
+                        onSubmit={changeFunctionSimplify}
+                    />
+                </Label>
+            </div>
+        );
+    }
     default:
         // Leave empty for now, if mode not supported
         return (
@@ -313,6 +339,7 @@ ModeToolsComponent.propTypes = {
     bitBrushSize: PropTypes.number,
     bitEraserSize: PropTypes.number,
     brushValue: PropTypes.number,
+    freeformValue: PropTypes.number,
     className: PropTypes.string,
     clipboardItems: PropTypes.arrayOf(PropTypes.array),
     eraserValue: PropTypes.number,
@@ -347,11 +374,15 @@ const mapStateToProps = state => ({
     bitEraserSize: state.scratchPaint.bitEraserSize,
     brushValue: state.scratchPaint.brushMode.brushSize,
     clipboardItems: state.scratchPaint.clipboard.items,
-    eraserValue: state.scratchPaint.eraserMode.brushSize
+    eraserValue: state.scratchPaint.eraserMode.brushSize,
+    freeformValue: state.scratchPaint.freeformMode.simplifySize,
 });
 const mapDispatchToProps = dispatch => ({
     onBrushSliderChange: brushSize => {
         dispatch(changeBrushSize(brushSize));
+    },
+    onSimplifySliderChange: size => {
+        dispatch(changeSimplifySize(size));
     },
     onBitBrushSliderChange: bitBrushSize => {
         dispatch(changeBitBrushSize(bitBrushSize));

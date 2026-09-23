@@ -22,6 +22,7 @@ import {changeFormat} from '../reducers/format';
 import {updateViewBounds} from '../reducers/view-bounds';
 import {saveZoomLevel, setZoomLevelId} from '../reducers/zoom-levels';
 import {setImportingImage} from '../lib/tw-is-importing-image';
+import {setPenPressure} from '../lib/pen';
 
 import styles from './paper-canvas.css';
 
@@ -33,6 +34,9 @@ class PaperCanvas extends React.Component {
             'setCanvas',
             'importSvg',
             'initializeSvg',
+            'handlePointerDown',
+            'handlePointerMove',
+            'handlePointerUp',
             'maybeZoomToFit',
             'switchCostume',
             'onViewResize',
@@ -60,6 +64,13 @@ class PaperCanvas extends React.Component {
         context.webkitImageSmoothingEnabled = false;
         context.imageSmoothingEnabled = false;
 
+        // Don't let the browser hijack pen input for scrolling while drawing
+        this.canvas.style.touchAction = 'none';
+        this.canvas.addEventListener('pointerdown', this.handlePointerDown);
+        this.canvas.addEventListener('pointermove', this.handlePointerMove);
+        this.canvas.addEventListener('pointerup', this.handlePointerUp);
+        this.canvas.addEventListener('pointercancel', this.handlePointerUp);
+
         // Don't show handles by default
         paper.settings.handleSize = 0;
         // Make layers.
@@ -84,11 +95,35 @@ class PaperCanvas extends React.Component {
     }
     componentWillUnmount () {
         this.clearQueuedImport();
+        if (this.canvas) {
+            this.canvas.style.touchAction = '';
+            this.canvas.removeEventListener('pointerdown', this.handlePointerDown);
+            this.canvas.removeEventListener('pointermove', this.handlePointerMove);
+            this.canvas.removeEventListener('pointerup', this.handlePointerUp);
+            this.canvas.removeEventListener('pointercancel', this.handlePointerUp);
+        }
         // shouldZoomToFit means the zoom level hasn't been initialized yet
         if (!this.shouldZoomToFit) {
             this.props.saveZoomLevel();
         }
         paper.remove();
+    }
+    handlePointerDown (event) {
+        if (event.pointerType === 'pen' && (!this.props.settingsStore || this.props.settingsStore.store.paintPenPressure === true)) {
+            setPenPressure(event.pressure);
+        } else {
+            setPenPressure(null);
+        }
+    }
+    handlePointerMove (event) {
+        if (event.pointerType === 'pen' && (!this.props.settingsStore || this.props.settingsStore.store.paintPenPressure === true)) {
+            setPenPressure(event.pressure);
+        } else {
+            setPenPressure(null);
+        }
+    }
+    handlePointerUp () {
+        setPenPressure(null);
     }
     clearQueuedImport () {
         if (this.queuedImport) {
@@ -386,13 +421,15 @@ PaperCanvas.propTypes = {
     zoomLevelId: PropTypes.string,
     zoomLevels: PropTypes.shape({
         currentZoomLevelId: PropTypes.string
-    })
+    }),
+    settingsStore: PropTypes.object
 };
 const mapStateToProps = state => ({
     mode: state.scratchPaint.mode,
     cursor: state.scratchPaint.cursor,
     format: state.scratchPaint.format,
-    zoomLevels: state.scratchPaint.zoomLevels
+    zoomLevels: state.scratchPaint.zoomLevels,
+    settingsStore: state.scratchPaint.settingsStore
 });
 const mapDispatchToProps = dispatch => ({
     undoSnapshot: snapshot => {

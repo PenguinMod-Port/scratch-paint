@@ -34,6 +34,7 @@ import LassoMode from '../../containers/lasso-mode.jsx';
 import BitLassoMode from '../../containers/bit-lasso-mode.jsx';
 import PanMode from '../../containers/pan-mode.jsx';
 import BitPanMode from '../../containers/bit-pan-mode.jsx';
+import FreeformMode from '../../containers/freeform-mode.jsx';
 import StrokeColorIndicatorComponent from '../../containers/stroke-color-indicator.jsx';
 import StrokeWidthIndicatorComponent from '../../containers/stroke-width-indicator.jsx';
 import TextMode from '../../containers/text-mode.jsx';
@@ -46,6 +47,8 @@ import zoomInIcon from './icons/zoom-in.svg';
 import zoomOutIcon from './icons/zoom-out.svg';
 import zoomResetIcon from './icons/zoom-reset.svg';
 import themeIcon from './icons/theme.svg';
+import fullscreenIcon from './icons/fullscreen.svg';
+import unfullscreenIcon from './icons/unfullscreen.svg';
 
 import MultiToolSelectComponent from '../multi-tool-select/multi-tool-select.jsx';
 import Modes from '../../lib/modes';
@@ -66,6 +69,7 @@ const messages = defineMessages({
 
 const PaintEditorComponent = props => (
     <div
+        ref={props.containerRef}
         className={styles.editorContainer}
         dir={props.rtl ? 'rtl' : 'ltr'}
         data-paint-theme={props.theme}
@@ -84,6 +88,12 @@ const PaintEditorComponent = props => (
                         onUpdateName={props.onUpdateName}
                         width={props.width}
                     />
+                    <Button
+                        className={styles.fullscreenButton}
+                        onClick={props.onToggleFullscreen}
+                    >
+                        <img src={fullscreenIcon} />
+                    </Button>
                 </div>
                 {/* Second Row */}
                 {isVector(props.format) ?
@@ -178,8 +188,19 @@ const PaintEditorComponent = props => (
                         textArea={props.textArea}
                         onUpdateImage={props.onUpdateImage}
                     />
-                    <LineMode
-                        onUpdateImage={props.onUpdateImage}
+                    <MultiToolSelectComponent
+                        tools={[
+                            <LineMode
+                                onUpdateImage={props.onUpdateImage}
+                            />,
+                            <FreeformMode
+                                onUpdateImage={props.onUpdateImage}
+                            />
+                        ]}
+                        modes={[
+                            Modes.LINE,
+                            Modes.FREEFORM
+                        ]}
                     />
                     <MultiToolSelectComponent
                         tools={[
@@ -394,6 +415,7 @@ PaintEditorComponent.propTypes = {
     onRedo: PropTypes.func.isRequired,
     onSwitchToBitmap: PropTypes.func.isRequired,
     onSwitchToVector: PropTypes.func.isRequired,
+    onToggleFullscreen: PropTypes.func.isRequired,
     onUndo: PropTypes.func.isRequired,
     onUpdateImage: PropTypes.func.isRequired,
     onUpdateName: PropTypes.func.isRequired,

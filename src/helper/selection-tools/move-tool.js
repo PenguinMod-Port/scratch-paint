@@ -26,10 +26,12 @@ class MoveTool {
      */
     constructor (mode, setSelectedItems, clearSelectedItems, onUpdateImage, switchToTextTool) {
         this.mode = mode;
+        this.anchorPosition = null;
         this.setSelectedItems = setSelectedItems;
         this.clearSelectedItems = clearSelectedItems;
         this.selectedItems = null;
         this.selectionCenter = null;
+        this.trueCenter = null;
         this.onUpdateImage = onUpdateImage;
         this.switchToTextTool = switchToTextTool;
         this.boundsPath = null;
@@ -45,7 +47,8 @@ class MoveTool {
      * @param {?boolean} hitProperties.subselect True if we allow selection of subgroups, false if we should
      *     select the whole group.
      */
-    onMouseDown (hitProperties) {
+    onMouseDown (hitProperties, anchorPosition) {
+        let relativeCenter;
         let item = hitProperties.hitResult.item;
         if (!hitProperties.subselect) {
             const root = getRootItem(hitProperties.hitResult.item);
@@ -67,6 +70,9 @@ class MoveTool {
                 this._select(item, false /* state */, hitProperties.subselect);
             }
         } else {
+            // if (this.selectionCenter)
+            //     relativeCenter = this.selectionCenter.subtract(this.trueCenter);
+            relativeCenter = new paper.Point(0,0);
             // deselect all by default if multiselect isn't on
             if (!hitProperties.multiselect) {
                 clearSelection(this.clearSelectedItems);
@@ -88,16 +94,22 @@ class MoveTool {
                 selectionBounds = selectedItem.bounds;
             }
         }
-        this.selectionCenter = selectionBounds.center;
+        if (this.anchorPosition && relativeCenter) this.anchorPosition.set(relativeCenter.add(selectionBounds.center));
+        this.selectionCenter = this.anchorPosition ? this.anchorPosition.clone() : selectionBounds.center;
+        this.trueCenter = selectionBounds.center;
 
         if (this.boundsPath) {
             this.selectedItems.push(this.boundsPath);
+            this.selectedItems.push(this.boundsPath.selectionAnchor);
         }
 
         this.firstDrag = true;
     }
-    setBoundsPath (boundsPath) {
+    setBoundsPath (boundsPath, anchorPosition) {
         this.boundsPath = boundsPath;
+
+        this.anchorPosition = anchorPosition;
+        this.selectionCenter = anchorPosition.clone();
     }
     /**
      * Sets the selection state of an item.
@@ -146,6 +158,7 @@ class MoveTool {
             return;
         }
 
+        const resultingMovement = snapVector || (event.modifiers.shift ? snapDeltaToAngle(dragVector, Math.PI / 4) : dragVector);
         let bounds;
         for (const item of this.selectedItems) {
             // add the position of the item before the drag started
@@ -154,13 +167,7 @@ class MoveTool {
                 item.data.origPos = item.position;
             }
 
-            if (snapVector) {
-                item.position = item.data.origPos.add(snapVector);
-            } else if (event.modifiers.shift) {
-                item.position = item.data.origPos.add(snapDeltaToAngle(dragVector, Math.PI / 4));
-            } else {
-                item.position = item.data.origPos.add(dragVector);
-            }
+            item.position = item.data.origPos.add(resultingMovement);
 
             if (bounds) {
                 bounds = bounds.unite(item.bounds);
@@ -168,6 +175,8 @@ class MoveTool {
                 bounds = item.bounds;
             }
         }
+        if (this.anchorPosition)
+            this.anchorPosition.set(this.selectionCenter.add(resultingMovement));
 
         if (this.firstDrag) {
             // Show the center crosshair above the selected item while dragging.

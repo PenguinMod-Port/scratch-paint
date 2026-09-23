@@ -104,7 +104,7 @@ const _removePaperItemsByTags = function (tags) {
 };
 
 const removeBoundsPath = function () {
-    _removePaperItemsByDataTags(['isSelectionBound', 'isRotHandle', 'isScaleHandle']);
+    _removePaperItemsByDataTags(['isSelectionBound', 'isRotHandle', 'isScaleHandle', 'isPivotAnchor', 'isCenterAnchor']);
 };
 
 const removeBoundsHandles = function () {

@@ -91,7 +91,7 @@ class LassoTool extends paper.Tool {
             match: hitResult => {
                 // Don't match helper items, unless they are handles.
                 if (!hitResult.item.data || !hitResult.item.data.isHelperItem) return true;
-                return hitResult.item.data.isScaleHandle || hitResult.item.data.isRotHandle;
+                return hitResult.item.data.isScaleHandle || hitResult.item.data.isRotHandle || hitResult.item.data.isPivotAnchor;
             }
         };
     }

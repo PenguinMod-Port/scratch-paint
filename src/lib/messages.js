@@ -75,6 +75,11 @@ const messages = defineMessages({
         defaultMessage: 'Pan',
         description: 'Label for the pan tool',
         id: 'pm.paint.panMode.pan'
+    },
+    freeform: {
+        defaultMessage: 'Freeform',
+        description: 'Label for the freeform tool',
+        id: 'pm.paint.FreeformMode.freeform'
     }
 });
 

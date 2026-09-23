@@ -1,5 +1,6 @@
 import paper from '@turbowarp/paper';
 import log from '../../log/log';
+import Cursors from '../../lib/cursors';
 
 /**
  * Tool for drawing rounded rectangles
@@ -9,7 +10,7 @@ class PanTool extends paper.Tool {
         super();
         
         this.setCursor = setCursor
-        this.setCursor("grab");
+        this.setCursor(Cursors.GRAB);
 
         this.onMouseDown = this.handleMouseDown;
         this.onMouseDrag = this.handleMouseDrag;
@@ -20,7 +21,7 @@ class PanTool extends paper.Tool {
 
     handleMouseDown(event) {
         if (event.event.button > 0) return; // only first mouse button
-        this.setCursor("grabbing");
+        this.setCursor(Cursors.GRABBING);
         this.active = true;
     }
 
@@ -32,12 +33,12 @@ class PanTool extends paper.Tool {
 
     handleMouseUp(event) {
         if (event.event.button > 0) return; // only first mouse button
-        this.setCursor("grab");
+        this.setCursor(Cursors.GRAB);
         this.active = false;
     }
 
     deactivateTool () {
-        this.setCursor();
+        this.setCursor(Cursors.DEFAULT);
     }
 }
 

@@ -9,8 +9,9 @@ import Cursors from '../../lib/cursors';
 import ScaleTool from './scale-tool';
 import RotateTool from './rotate-tool';
 import MoveTool from './move-tool';
+import RepivotTool from './repivot-tool';
 
-const SELECTION_ANCHOR_SIZE = 12;
+const SELECTION_ANCHOR_SIZE = 14;
 /** SVG for the rotation icon on the bounding box */
 const ARROW_PATH = 'M19.28,1.09C19.28.28,19,0,18.2,0c-1.67,0-3.34,0-5,0-.34,0-.88.24-1,.47a1.4,1.4,' +
     '0,0,0,.36,1.08,15.27,15.27,0,0,0,1.46,1.36A6.4,6.4,0,0,1,6.52,4,5.85,5.85,0,0,1,5.24,3,15.27,15.27,' +
@@ -22,7 +23,8 @@ const ARROW_PATH = 'M19.28,1.09C19.28.28,19,0,18.2,0c-1.67,0-3.34,0-5,0-.34,0-.8
 const BoundingBoxModes = keyMirror({
     SCALE: null,
     ROTATE: null,
-    MOVE: null
+    MOVE: null,
+    REPIVOT: null
 });
 
 /**
@@ -46,6 +48,8 @@ class BoundingBoxTool {
         this.onUpdateImage = onUpdateImage;
         this.mode = null;
         this.boundsPath = null;
+        this.anchorCrosshair = null;
+        this.anchorPosition = null;
         this.boundsScaleHandles = [];
         this.boundsRotHandles = [];
         this._modeMap = {};
@@ -53,6 +57,7 @@ class BoundingBoxTool {
         this._modeMap[BoundingBoxModes.ROTATE] = new RotateTool(onUpdateImage);
         this._modeMap[BoundingBoxModes.MOVE] =
             new MoveTool(mode, setSelectedItems, clearSelectedItems, onUpdateImage, switchToTextTool);
+        this._modeMap[BoundingBoxModes.REPIVOT] = new RepivotTool();
         this._currentCursor = null;
     }
 
@@ -62,6 +67,7 @@ class BoundingBoxTool {
      */
     onSelectionChanged (selectedItems) {
         if (selectedItems && selectedItems.length) {
+            this.anchorPosition = null;
             this.setSelectionBounds();
         } else {
             this.removeBoundsPath();
@@ -82,6 +88,7 @@ class BoundingBoxTool {
         const {hitResult, mode} = this._determineMode(event, multiselect, hitOptions);
         if (!hitResult) {
             if (!multiselect) {
+                this.anchorPosition = null; // see also ./move-tool.js L73-74
                 this.removeBoundsPath();
             }
             return false;
@@ -95,16 +102,19 @@ class BoundingBoxTool {
             doubleClicked: doubleClicked
         };
         if (this.mode === BoundingBoxModes.MOVE) {
-            this._modeMap[this.mode].onMouseDown(hitProperties);
+            this._modeMap[this.mode].onMouseDown(hitProperties, this.anchorPosition);
             this.removeBoundsHandles();
         } else if (this.mode === BoundingBoxModes.SCALE) {
-            this._modeMap[this.mode].onMouseDown(hitResult, this.boundsPath, getSelectedRootItems());
+            this._modeMap[this.mode].onMouseDown(hitResult, this.boundsPath, this.anchorCrosshair, this.anchorPosition, getSelectedRootItems());
             this.removeBoundsHandles();
         } else if (this.mode === BoundingBoxModes.ROTATE) {
             this.setCursor(Cursors.GRABBING);
-            this._modeMap[this.mode].onMouseDown(hitResult, this.boundsPath, getSelectedRootItems());
+            this._modeMap[this.mode].onMouseDown(event, getSelectedRootItems(), this.anchorPosition);
             // While transforming, don't show bounds
             this.removeBoundsPath();
+        } else if (this.mode === BoundingBoxModes.REPIVOT) {
+            this._modeMap[this.mode].onMouseDown(hitProperties, this.boundsPath, this.boundsPath.selectionAnchor, this.anchorPosition);
+            this.removeBoundsHandles();
         }
 
         return true;
@@ -157,6 +167,9 @@ class BoundingBoxTool {
             } else if (hitResults[i].item.data && hitResults[i].item.data.isRotHandle) {
                 hitResult = hitResults[i];
                 mode = BoundingBoxModes.ROTATE;
+            } else if (hitResults[i].item.data && hitResults[i].item.data.isPivotAnchor) {
+                hitResult = hitResults[i];
+                mode = BoundingBoxModes.REPIVOT;
             }
         }
         if (!mode) {
@@ -171,7 +184,7 @@ class BoundingBoxTool {
 
         // Set the cursor for moving a sprite once the drag has actually started (i.e. the mouse has been moved while
         // pressed), so that the mouse doesn't "flash" to the grabbing cursor every time a sprite is clicked.
-        if (this.mode === BoundingBoxModes.MOVE) {
+        if (this.mode === BoundingBoxModes.MOVE || this.mode === BoundingBoxModes.REPIVOT) {
             this.setCursor(Cursors.GRABBING);
         }
     }
@@ -203,6 +216,7 @@ class BoundingBoxTool {
                 rect = item.bounds;
             }
         }
+        this.anchorPosition ||= rect.center.clone();
 
         if (!this.boundsPath) {
             this.boundsPath = new paper.Group();
@@ -213,6 +227,19 @@ class BoundingBoxTool {
             this.boundsRect.curves[6].divideAtTime(0.5);
             this.boundsPath.addChild(this.boundsRect);
 
+            const anchorSelectionCircle =
+                new paper.Path.Circle({
+                    center: new paper.Point(0,0),
+                    radius: 7,
+                    fillColor: '#009dec10',
+                    data: {
+                        isPivotAnchor: true,
+                        isCenterAnchor: true,
+                        isHelperItem: true,
+                        noSelect: true,
+                        noHover: true
+                    }
+                });
             const vRect = new paper.Path.Rectangle({
                 point: [-1, -6],
                 size: [2, 12],
@@ -225,11 +252,19 @@ class BoundingBoxTool {
                 radius: 1,
                 insert: false
             });
-            const anchorIcon = vRect.unite(hRect);
+            const anchorCrosshair = vRect.unite(hRect);
+            anchorCrosshair.data.isPivotAnchor = true;
+            anchorCrosshair.data.isCenterAnchor = true;
+            anchorCrosshair.data.isHelperItem = true;
+            anchorCrosshair.data.noSelect = true;
+            anchorCrosshair.data.noHover = true;
+            this.anchorCrosshair = anchorCrosshair;
 
-            this.boundsPath.addChild(anchorIcon);
+            const anchorIcon = new paper.Group([anchorCrosshair, anchorSelectionCircle]);
+            anchorIcon.parent = getGuideLayer();
             this.boundsPath.selectionAnchor = anchorIcon;
-            this._modeMap[BoundingBoxModes.MOVE].setBoundsPath(this.boundsPath);
+
+            this._modeMap[BoundingBoxModes.MOVE].setBoundsPath(this.boundsPath, this.anchorPosition);
         }
         setGuideItem(this.boundsPath);
         this.boundsPath.data.isSelectionBound = true;
@@ -238,9 +273,12 @@ class BoundingBoxTool {
         this.boundsPath.parent = getGuideLayer();
         this.boundsPath.strokeWidth = 1 / paper.view.zoom;
         this.boundsPath.strokeColor = getGuideColor();
+
         this.boundsPath.selectionAnchor.scale(
-            SELECTION_ANCHOR_SIZE / paper.view.zoom / this.boundsPath.selectionAnchor.bounds.width);
-        this.boundsPath.selectionAnchor.position = rect.center;
+            SELECTION_ANCHOR_SIZE / paper.view.zoom / this.anchorCrosshair.bounds.width);
+        this.boundsPath.selectionAnchor.position = this.anchorPosition.clone();
+        this.anchorCrosshair.strokeWidth = 1 / paper.view.zoom;
+        this.anchorCrosshair.strokeColor = getGuideColor();
 
         // Make a template to copy
         const boundsScaleCircleShadow =
@@ -316,9 +354,12 @@ class BoundingBoxTool {
         boundsScaleHandle.remove();
     }
     removeBoundsPath () {
+        if (this.boundsPath)
+            this.boundsPath.selectionAnchor.remove();
         removeBoundsPath();
         this.boundsPath = null;
         this.boundsRect = null;
+        this.anchorCrosshair = null;
         this.boundsScaleHandles.length = 0;
         this.boundsRotHandles.length = 0;
     }

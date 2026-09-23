@@ -297,10 +297,12 @@ class ReshapeTool extends paper.Tool {
     }
     handleMouseDrag (event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
+        if (!this._modeMap[this.mode]) return;
         this._modeMap[this.mode].onMouseDrag(event);
     }
     handleMouseUp (event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
+        if (!this._modeMap[this.mode]) return;
         if (this.mode === ReshapeModes.SELECTION_BOX) {
             this._modeMap[this.mode].onMouseUpVector(event);
         } else {

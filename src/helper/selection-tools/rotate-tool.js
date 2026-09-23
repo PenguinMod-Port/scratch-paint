@@ -11,6 +11,7 @@ class RotateTool {
         this.rotItems = [];
         this.rotGroupPivot = null;
         this.prevRot = 90;
+        this.inSnappedAngles = false;
         this.onUpdateImage = onUpdateImage;
     }
 
@@ -19,21 +20,25 @@ class RotateTool {
      * @param {!object} boundsPath Where the boundaries of the hit item are
      * @param {!Array.<paper.Item>} selectedItems Set of selected paper.Items
      */
-    onMouseDown (hitResult, boundsPath, selectedItems) {
-        this.rotGroupPivot = boundsPath.bounds.center;
+    onMouseDown (event, selectedItems, anchorPosition) {
+        this.rotGroupPivot = anchorPosition;
         for (const item of selectedItems) {
             // Rotate only root items
             if (item.parent instanceof paper.Layer) {
                 this.rotItems.push(item);
             }
         }
-        this.prevRot = 90;
+        this.prevRot = (event.point.subtract(this.rotGroupPivot)).angle;
     }
     onMouseDrag (event) {
         let rotAngle = (event.point.subtract(this.rotGroupPivot)).angle;
         if (event.modifiers.shift) {
             rotAngle = Math.round(rotAngle / 45) * 45;
+            // ensure that we have a difference of ZERO when we enter
+            if (!this.inSnappedAngles)
+                this.prevRot = rotAngle;
         }
+        this.inSnappedAngles = event.modifiers.shift;
 
         for (let i = 0; i < this.rotItems.length; i++) {
             const item = this.rotItems[i];
