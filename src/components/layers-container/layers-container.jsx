@@ -14,6 +14,16 @@ const BufferedInput = BufferedInputHOC(Input);
 import styles from './layers-container.css';
 import placeholderImage from '../rect-mode/rectangle.svg';
 
+const iconMap = new Map([
+    ["Group", require('./icons/group.svg')],
+    ["Path", require('./icons/path.svg')],
+    ["PointText", require('./icons/text.svg')]
+])
+
+const nameMap = new Map([
+    ["PointText", "Text"]
+])
+
 class LayersContainer extends React.Component {
     constructor (props) {
         super(props);
@@ -37,10 +47,10 @@ class LayersContainer extends React.Component {
         return (<div key={layer.id} className={classNames(styles.layer, {[styles.active]: this.isSelected(layer)})}>
             {(layer.getChildren() || []).map(this.renderLayer)}
             <div className={styles.info} onClick={() => this.selectLayer(layer)}>
-                <img alt="" src={placeholderImage} />
+                <img alt="" src={iconMap.get(layer.className) ?? placeholderImage} />
                 <BufferedInput
                     type="text"
-                    placeholder={layer.className}
+                    placeholder={nameMap.get(layer.className) ?? layer.className}
                     value={layer.name}
                     onSubmit={e => this.setLayerName(layer, e.target.value)}
                 />
