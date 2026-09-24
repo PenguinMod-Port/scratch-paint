@@ -390,7 +390,9 @@ const PaintEditorComponent = props => (
                     </InputGroup>
                 </div>
             </div>
-            {isVector(props.format) && <LayersContainer />}
+            {isVector(props.format) && <LayersContainer
+                onUpdateImage={props.onUpdateImage}
+            />}
         </div>
     </div>
 );

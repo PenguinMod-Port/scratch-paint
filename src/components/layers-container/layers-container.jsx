@@ -53,7 +53,7 @@ class LayersContainer extends React.Component {
                     type="text"
                     placeholder={nameMap.get(layer.className) ?? layer.className}
                     value={layer.name}
-                    onSubmit={e => this.setLayerName(layer, e.target.value)}
+                    onSubmit={name => this.setLayerName(layer, name)}
                 />
             </div>
             {(layer.getChildren() || []).toReversed().map(this.renderLayer)}
@@ -68,7 +68,9 @@ class LayersContainer extends React.Component {
     }
 
     setLayerName (layer, name) {
+        if (layer.name === name) return;
         layer.name = name;
+        this.props.onUpdateImage();
     }
 
     topLevelLayers () {
@@ -87,6 +89,7 @@ class LayersContainer extends React.Component {
 }
 
 LayersContainer.propTypes = {
+    onUpdateImage: PropTypes.func.isRequired,
     selectedItems: PropTypes.arrayOf(PropTypes.instanceOf(paper.Item)),
     setSelectedItems: PropTypes.func.isRequired,
 };
