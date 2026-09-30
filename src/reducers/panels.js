@@ -2,13 +2,13 @@ import Panels from '../lib/panels';
 import log from '../log/log';
 
 const CHANGE_PANEL = 'scratch-paint/panels/CHANGE_PANEL';
-const initialState = Panels.LAYERS;
+const initialState = null;
 
 const reducer = function (state, action) {
     if (typeof state === 'undefined') state = initialState;
     switch (action.type) {
     case CHANGE_PANEL:
-        if (action.panel in Panels) {
+        if (action.panel in Panels || action.panel === null) {
             return action.panel;
         }
         log.warn(`Panel does not exist: ${action.panel}`);

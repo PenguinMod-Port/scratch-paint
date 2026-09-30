@@ -18,15 +18,21 @@ import styles from './layers-panel.css';
 import placeholderImage from '../rect-mode/rectangle.svg';
 
 const iconMap = new Map([
+    ["CompoundPath", require('./icons/path.svg')],
     ["Group", require('./icons/group.svg')],
     ["Path", require('./icons/path.svg')],
     ["PointText", require('./icons/text.svg')],
-    ["Raster", require('./icons/bitmap.svg')]
-])
+    ["Raster", require('./icons/bitmap.svg')],
+]);
 
 const nameMap = new Map([
+    ["CompoundPath", "Path"],
     ["PointText", "Text"],
-    ["Raster", "Bitmap"]
+    ["Raster", "Bitmap"],
+]);
+
+const hideChildren = new Set([
+    "CompoundPath"
 ])
 
 class LayersPanel extends React.Component {
@@ -59,7 +65,7 @@ class LayersPanel extends React.Component {
                     onSubmit={name => this.setLayerName(layer, name)}
                 />
             </div>
-            {(layer.getChildren() || []).toReversed().map(this.renderLayer)}
+            {!hideChildren.has(layer.className) && (layer.getChildren() || []).toReversed().map(this.renderLayer)}
         </div>);
     }
 

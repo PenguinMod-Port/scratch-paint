@@ -49,10 +49,13 @@ import zoomResetIcon from './icons/zoom-reset.svg';
 import themeIcon from './icons/theme.svg';
 import fullscreenIcon from './icons/fullscreen.svg';
 import unfullscreenIcon from './icons/unfullscreen.svg';
+import layersPanelIcon from './icons/panels/layers.svg';
 
 import MultiToolSelectComponent from '../multi-tool-select/multi-tool-select.jsx';
+import PanelSelectComponent from '../panel-select-base/panel-select-base.jsx';
 import Modes from '../../lib/modes';
 import LayersPanel from '../layers-panel/layers-panel.jsx';
+import Panels from '../../lib/panels.js';
 
 const messages = defineMessages({
     bitmap: {
@@ -64,6 +67,12 @@ const messages = defineMessages({
         defaultMessage: 'Convert to Vector',
         description: 'Label for button that converts the paint editor to vector mode',
         id: 'paint.paintEditor.vector'
+    },
+
+    layers: {
+        defaultMessage: 'Layers',
+        description: 'Label for button that switches to the layers panel',
+        id: 'pm.paint.paintEditor.layers'
     }
 });
 
@@ -390,9 +399,19 @@ const PaintEditorComponent = props => (
                     </InputGroup>
                 </div>
             </div>
-            {isVector(props.format) && <LayersPanel
-                onUpdateImage={props.onUpdateImage}
-            />}
+            {isVector(props.format) && (<React.Fragment>
+                <LayersPanel
+                    onUpdateImage={props.onUpdateImage}
+                />
+
+                <div className={styles.modeSelector}>
+                    <PanelSelectComponent
+                        imgDescriptor={messages.layers}
+                        imgSrc={layersPanelIcon}
+                        panel={Panels.LAYERS}
+                    />
+                </div>
+            </React.Fragment>)}
         </div>
     </div>
 );

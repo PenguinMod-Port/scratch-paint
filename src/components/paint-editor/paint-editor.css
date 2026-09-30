@@ -32,6 +32,7 @@
     padding-top: calc(5 * $grid-unit);
     min-width: 524px;
     overflow-y: auto; /* please tell me why this fixed it */
+    gap: calc(2 * $grid-unit);
 }
 
 .row + .row {
@@ -130,8 +131,6 @@ $border-radius: 0.25rem;
     display: flex;
     flex-flow: column;
     flex-grow: 1;
-    margin-left: calc(2 * $grid-unit);
-    margin-right: calc(2 * $grid-unit);
 }
 
 .canvas-container {
