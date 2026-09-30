@@ -7,11 +7,14 @@ import paper from '@turbowarp/paper';
 import {setSelectedItems} from '../../reducers/selected-items';
 import {getSelectedLeafItems, setItemSelection} from '../../helper/selection';
 
+import PanelComponent from '../panel/panel.jsx';
+import Panels from '../../lib/panels';
+
 import BufferedInputHOC from '../forms/buffered-input-hoc.jsx';
 import Input from '../forms/input.jsx';
 const BufferedInput = BufferedInputHOC(Input);
 
-import styles from './layers-container.css';
+import styles from './layers-panel.css';
 import placeholderImage from '../rect-mode/rectangle.svg';
 
 const iconMap = new Map([
@@ -26,7 +29,7 @@ const nameMap = new Map([
     ["Raster", "Bitmap"]
 ])
 
-class LayersContainer extends React.Component {
+class LayersPanel extends React.Component {
     constructor (props) {
         super(props);
         bindAll(this, [
@@ -81,14 +84,14 @@ class LayersContainer extends React.Component {
 
     render () {
         return (
-            <div className={styles.layersContainer}>
+            <PanelComponent panel={Panels.LAYERS}>
                 {paper.project && this.topLevelLayers().toReversed().map(this.renderLayer)}
-            </div>
+            </PanelComponent>
         );
     }
 }
 
-LayersContainer.propTypes = {
+LayersPanel.propTypes = {
     onUpdateImage: PropTypes.func.isRequired,
     selectedItems: PropTypes.arrayOf(PropTypes.instanceOf(paper.Item)),
     setSelectedItems: PropTypes.func.isRequired,
@@ -108,4 +111,4 @@ export default connect(
     mapDispatchToProps,
     null,
     {pure: false}
-)(LayersContainer);
+)(LayersPanel);

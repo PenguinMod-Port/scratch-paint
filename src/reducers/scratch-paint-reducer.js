@@ -30,6 +30,7 @@ import viewBoundsReducer from './view-bounds';
 import undoReducer from './undo';
 import zoomLevelsReducer from './zoom-levels';
 import editorSettingsStoreReducer from './editor-settings-store';
+import panelReducer from './panels';
 
 export default combineReducers({
     mode: modeReducer,
@@ -63,5 +64,6 @@ export default combineReducers({
     viewBounds: viewBoundsReducer,
     zoomLevels: zoomLevelsReducer,
 
-    settingsStore: editorSettingsStoreReducer
+    settingsStore: editorSettingsStoreReducer,
+    panel: panelReducer,
 });
