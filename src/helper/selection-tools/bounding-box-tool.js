@@ -105,7 +105,7 @@ class BoundingBoxTool {
             this._modeMap[this.mode].onMouseDown(hitProperties, this.anchorPosition);
             this.removeBoundsHandles();
         } else if (this.mode === BoundingBoxModes.SCALE) {
-            this._modeMap[this.mode].onMouseDown(hitResult, this.boundsPath, this.anchorCrosshair, this.anchorPosition, getSelectedRootItems());
+            this._modeMap[this.mode].onMouseDown(hitResult, this.boundsPath, this.boundsPath.selectionAnchor, this.anchorPosition, getSelectedRootItems());
             this.removeBoundsHandles();
         } else if (this.mode === BoundingBoxModes.ROTATE) {
             this.setCursor(Cursors.GRABBING);
