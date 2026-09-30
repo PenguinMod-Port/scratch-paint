@@ -54,7 +54,7 @@ const mapDispatchToProps = dispatch => ({
         dispatch(changePanel(panel));
 
         // resize canvas properly
-        window.dispatchEvent(new Event('resize'));
+        queueMicrotask(() => window.dispatchEvent(new Event('resize')));
     }
 });
 
