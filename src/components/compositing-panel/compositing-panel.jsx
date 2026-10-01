@@ -1,17 +1,18 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
-import {FormattedMessage} from 'react-intl';
+import {FormattedMessage, defineMessages, injectIntl, intlShape} from 'react-intl';
 import bindAll from 'lodash.bindall';
 import classNames from 'classnames';
 import paper from '@turbowarp/paper';
 
-import { getSelectedRootItems } from '../../helper/selection.js';
+import {getSelectedRootItems} from '../../helper/selection.js';
 
 import PanelComponent from '../panel/panel.jsx';
 import Panels from '../../lib/panels';
 
 import Slider, {HANDLE_WIDTH, CONTAINER_WIDTH} from '../forms/slider.jsx';
+import Select from '../forms/select.jsx';
 import TWColorReadout from '../tw-color-readout/tw-color-readout.jsx';
 
 import alphaBackground from './alpha.png';
@@ -21,12 +22,36 @@ const hsvToHex = (h, s, v) => parseColor(`hsv(${3.6 * h}, ${s}, ${v})`).hex;
 
 import styles from './compositing-panel.css';
 
+const messages = defineMessages({
+    normal: {
+        defaultMessage: 'normal',
+        description: 'Normal blend mode',
+        id: 'pm.paint.compositingPanel.blend.normal'
+    },
+    multiplicative: {
+        defaultMessage: 'multiplicative',
+        description: 'Multiplicative blend mode',
+        id: 'pm.paint.compositingPanel.blend.multiplicative'
+    },
+    screen: {
+        defaultMessage: 'screen',
+        description: 'Screen blend mode',
+        id: 'pm.paint.compositingPanel.blend.screen'
+    },
+    difference: {
+        defaultMessage: 'difference',
+        description: 'Difference blend mode',
+        id: 'pm.paint.compositingPanel.blend.difference'
+    },
+});
+
 class CompositingPanel extends React.Component {
     constructor (props) {
         super(props);
         bindAll(this, [
             'changeOpacity',
-            'onSubmit'
+            'onSubmitOpacity',
+            'setBlendMode'
         ]);
 
         this.opacityBackground = this._makeOpacityBackground();
@@ -63,8 +88,16 @@ class CompositingPanel extends React.Component {
         this.forceUpdate();
     }
 
-    onSubmit(value) {
+    onSubmitOpacity(value) {
         this.changeOpacity(value);
+        this.props.onUpdateImage();
+    }
+
+    setBlendMode(event) {
+        getSelectedRootItems().forEach(layer => {
+            layer.setBlendMode(event.target.value)
+        });
+
         this.props.onUpdateImage();
     }
 
@@ -72,6 +105,30 @@ class CompositingPanel extends React.Component {
         return (
             <PanelComponent panel={Panels.COMPOSITING}>
                 {paper.project && getSelectedRootItems().length > 0 && (<React.Fragment>
+                    <div className={styles.row}>
+                        <div className={styles.rowHeader}>
+                            <span className={styles.labelName}>
+                                <FormattedMessage
+                                    defaultMessage="Blend Mode"
+                                    description="Label for the blend mode component in the compositing panel"
+                                    id="pm.paint.compositingPanel.blendMode"
+                                />
+                            </span>
+                        </div>
+                        <div>
+                            <Select
+                                className={styles.select}
+                                value={getSelectedRootItems()[0].blendMode}
+                                onChange={this.setBlendMode}
+                                options={[
+                                    [this.props.intl.formatMessage(messages.normal), 'normal'],
+                                    [this.props.intl.formatMessage(messages.multiplicative), 'multiply'],
+                                    [this.props.intl.formatMessage(messages.screen), 'screen'],
+                                    [this.props.intl.formatMessage(messages.difference), 'difference']
+                                ]}
+                            />
+                        </div>
+                    </div>
                     <div className={styles.row}>
                         <div className={styles.rowHeader}>
                             <span className={styles.labelName}>
@@ -86,12 +143,12 @@ class CompositingPanel extends React.Component {
                                 onChange={this.onSubmit}
                             />
                         </div>
-                        <div className={styles.rowSlider}>
+                        <div>
                             <Slider
                                 background={this.opacityBackground}
                                 value={getSelectedRootItems()[0].opacity * 100}
                                 onChange={this.changeOpacity}
-                                onSubmit={this.onSubmit}
+                                onSubmit={this.onSubmitOpacity}
                             />
                         </div>
                     </div>
@@ -102,7 +159,8 @@ class CompositingPanel extends React.Component {
 }
 
 CompositingPanel.propTypes = {
-    onUpdateImage: PropTypes.func.isRequired
+    onUpdateImage: PropTypes.func.isRequired,
+    intl: intlShape
 };
 
 const mapStateToProps = state => ({
@@ -112,9 +170,9 @@ const mapDispatchToProps = dispatch => ({
     
 });
 
-export default connect(
+export default injectIntl(connect(
     mapStateToProps,
     mapDispatchToProps,
     null,
     {pure: false}
-)(CompositingPanel);
+)(CompositingPanel));

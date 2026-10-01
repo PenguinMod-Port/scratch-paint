@@ -1,0 +1,27 @@
+@import "../../css/colors";
+
+.select {
+    padding: 0.25rem 1rem;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: $text-primary;
+    background-color: $input-background;
+    border-width: 1px;
+    border-style: solid;
+    border-color: $form-border;
+    border-radius: 0.5rem;
+    outline: none;
+    cursor: pointer;
+    transition: 0.25s ease-out;
+    box-shadow: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.option {
+    padding: 0;
+    margin: 0;
+}
