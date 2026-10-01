@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
+import {defineMessages, injectIntl, intlShape} from 'react-intl';
 import bindAll from 'lodash.bindall';
 import classNames from 'classnames';
 import paper from '@turbowarp/paper';
@@ -17,6 +18,29 @@ const BufferedInput = BufferedInputHOC(Input);
 import styles from './layers-panel.css';
 import placeholderImage from '../rect-mode/rectangle.svg';
 
+const messages = defineMessages({
+    group: {
+        defaultMessage: 'Group',
+        description: 'Default name for the group layer',
+        id: 'pm.paint.layersPanel.group'
+    },
+    path: {
+        defaultMessage: 'Path',
+        description: 'Default name for the path layer',
+        id: 'pm.paint.layersPanel.path'
+    },
+    text: {
+        defaultMessage: 'Text',
+        description: 'Default name for the text layer',
+        id: 'pm.paint.layersPanel.text'
+    },
+    bitmap: {
+        defaultMessage: 'Bitmap',
+        description: 'Default name for the bitmap layer',
+        id: 'pm.paint.layersPanel.bitmap'
+    },
+});
+
 const iconMap = new Map([
     ["CompoundPath", require('./icons/path.svg')],
     ["Group", require('./icons/group.svg')],
@@ -26,14 +50,16 @@ const iconMap = new Map([
 ]);
 
 const nameMap = new Map([
-    ["CompoundPath", "Path"],
-    ["PointText", "Text"],
-    ["Raster", "Bitmap"],
+    ["CompoundPath", messages.path],
+    ["Group", messages.group],
+    ["Path", messages.path],
+    ["PointText", messages.text],
+    ["Raster", messages.bitmap],
 ]);
 
 const hideChildren = new Set([
     "CompoundPath"
-])
+]);
 
 class LayersPanel extends React.Component {
     constructor (props) {
@@ -55,12 +81,15 @@ class LayersPanel extends React.Component {
     }
 
     renderLayer (layer) {
+        let defaultName = nameMap.get(layer.className);
+        defaultName = defaultName ? this.props.intl.formatMessage(defaultName) : layer.className;
+
         return (<div key={layer.id} className={classNames(styles.layer, {[styles.active]: this.isSelected(layer)})}>
             <div className={styles.info} onClick={(e) => this.selectLayer(layer, e)}>
                 <img alt="" src={iconMap.get(layer.className) ?? placeholderImage} />
                 <BufferedInput
                     type="text"
-                    placeholder={nameMap.get(layer.className) ?? layer.className}
+                    placeholder={defaultName}
                     value={layer.name}
                     onSubmit={name => this.setLayerName(layer, name)}
                 />
@@ -98,6 +127,7 @@ class LayersPanel extends React.Component {
 }
 
 LayersPanel.propTypes = {
+    intl: intlShape,
     onUpdateImage: PropTypes.func.isRequired,
     selectedItems: PropTypes.arrayOf(PropTypes.instanceOf(paper.Item)),
     setSelectedItems: PropTypes.func.isRequired,
@@ -112,9 +142,9 @@ const mapDispatchToProps = dispatch => ({
     }
 });
 
-export default connect(
+export default injectIntl(connect(
     mapStateToProps,
     mapDispatchToProps,
     null,
     {pure: false}
-)(LayersPanel);
+)(LayersPanel));

@@ -35,11 +35,13 @@ class SliderComponent extends React.Component {
         this.handleClickOffset = getEventXY(event).x - this.handle.getBoundingClientRect().left;
     }
 
-    handleMouseUp () {
+    handleMouseUp (event) {
         document.removeEventListener('mousemove', this.handleMouseMove);
         document.removeEventListener('mouseup', this.handleMouseUp);
         document.removeEventListener('touchmove', this.handleMouseMove, {passive: false});
         document.removeEventListener('touchend', this.handleMouseUp);
+
+        if (this.props.onSubmit) this.props.onSubmit(this.scaleMouseToSliderPosition(event));
     }
 
     handleMouseMove (event) {
@@ -108,6 +110,7 @@ SliderComponent.propTypes = {
     background: PropTypes.string,
     lastSlider: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func,
     value: PropTypes.number.isRequired
 };
 

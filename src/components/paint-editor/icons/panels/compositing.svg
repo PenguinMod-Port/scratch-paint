@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" xmlns:bx="https://boxy-svg.com">
+  <ellipse style="fill: none; stroke: rgb(87, 94, 117);" cx="10" cy="10" rx="5.5" ry="5.5"></ellipse>
+  <path style="fill: rgb(87, 94, 117);" transform="matrix(0.032823, 0, 0, 0.032823, -10.481551, -1.422398)" d="M 624 165.201 A 182.799 182.799 0 1 1 624 530.799 L 624 348 Z" bx:shape="pie 624 348 0 182.799 0 180 1@ac7481b6"></path>
+</svg>

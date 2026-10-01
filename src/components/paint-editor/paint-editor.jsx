@@ -49,11 +49,13 @@ import zoomResetIcon from './icons/zoom-reset.svg';
 import themeIcon from './icons/theme.svg';
 import fullscreenIcon from './icons/fullscreen.svg';
 import unfullscreenIcon from './icons/unfullscreen.svg';
+import compositingPanelIcon from './icons/panels/compositing.svg';
 import layersPanelIcon from './icons/panels/layers.svg';
 
 import MultiToolSelectComponent from '../multi-tool-select/multi-tool-select.jsx';
 import PanelSelectComponent from '../panel-select-base/panel-select-base.jsx';
 import Modes from '../../lib/modes';
+import CompositingPanel from '../compositing-panel/compositing-panel.jsx';
 import LayersPanel from '../layers-panel/layers-panel.jsx';
 import Panels from '../../lib/panels.js';
 
@@ -69,6 +71,11 @@ const messages = defineMessages({
         id: 'paint.paintEditor.vector'
     },
 
+    compositing: {
+        defaultMessage: 'Compositing',
+        description: 'Label for button that switches to the compositing panel',
+        id: 'pm.paint.paintEditor.compositing'
+    },
     layers: {
         defaultMessage: 'Layers',
         description: 'Label for button that switches to the layers panel',
@@ -400,11 +407,16 @@ const PaintEditorComponent = props => (
                 </div>
             </div>
             {isVector(props.format) && (<React.Fragment>
-                <LayersPanel
-                    onUpdateImage={props.onUpdateImage}
-                />
+                <CompositingPanel onUpdateImage={props.onUpdateImage} />
+                <LayersPanel onUpdateImage={props.onUpdateImage} />
 
                 <div className={styles.modeSelector}>
+                    <PanelSelectComponent
+                        imgDescriptor={messages.compositing}
+                        imgSrc={compositingPanelIcon}
+                        panel={Panels.COMPOSITING}
+                    />
+
                     <PanelSelectComponent
                         imgDescriptor={messages.layers}
                         imgSrc={layersPanelIcon}
