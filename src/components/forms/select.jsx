@@ -13,7 +13,6 @@ import classNames from 'classnames';
 import styles from './select.css';
 
 const Input = props => {
-    console.log(props)
     return (
         <select
             {...props}

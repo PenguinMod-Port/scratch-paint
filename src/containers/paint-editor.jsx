@@ -275,7 +275,7 @@ class PaintEditor extends React.Component {
             } else {
                 await this.containerRef.current.requestFullscreen();
             }
-        } catch (e) {console.log(e)}
+        } catch (e) {}
     }
     setCanvas (canvas) {
         this.setState({canvas: canvas});

@@ -76,7 +76,6 @@ class CompositingPanel extends React.Component {
         stops[stops.length - 1] += ` ${CONTAINER_WIDTH - halfHandleWidth}px 100%`;
 
         let css = `linear-gradient(to left, ${stops.join(',')}), url("${alphaBackground}")`;
-        console.log(css);
         return css;
     }
 
