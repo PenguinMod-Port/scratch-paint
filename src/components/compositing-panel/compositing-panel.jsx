@@ -34,15 +34,75 @@ const messages = defineMessages({
         id: 'pm.paint.compositingPanel.blend.multiplicative'
     },
     screen: {
-        defaultMessage: 'screen',
+        defaultMessage: 'Screen',
         description: 'Screen blend mode',
         id: 'pm.paint.compositingPanel.blend.screen'
     },
+    overlay: {
+        defaultMessage: 'Overlay',
+        description: 'Overlay blend mode',
+        id: 'pm.paint.compositingPanel.blend.overlay'
+    },
+    softLight: {
+        defaultMessage: 'Soft Light',
+        description: 'Soft light blend mode',
+        id: 'pm.paint.compositingPanel.blend.softLight'
+    },
+    hardLight: {
+        defaultMessage: 'Hard Light',
+        description: 'Hard light blend mode',
+        id: 'pm.paint.compositingPanel.blend.hardLight'
+    },
+    colorDodge: {
+        defaultMessage: 'Color Dodge',
+        description: 'Color dodge blend mode',
+        id: 'pm.paint.compositingPanel.blend.colorDodge'
+    },
+    colorBurn: {
+        defaultMessage: 'Color Burn',
+        description: 'Color burn blend mode',
+        id: 'pm.paint.compositingPanel.blend.colorBurn'
+    },
+    darken: {
+        defaultMessage: 'Darken',
+        description: 'Darken blend mode',
+        id: 'pm.paint.compositingPanel.blend.darken'
+    },
+    lighten: {
+        defaultMessage: 'Lighten',
+        description: 'Lighten blend mode',
+        id: 'pm.paint.compositingPanel.blend.lighten'
+    },
     difference: {
-        defaultMessage: 'difference',
+        defaultMessage: 'Difference',
         description: 'Difference blend mode',
         id: 'pm.paint.compositingPanel.blend.difference'
     },
+    exclusion: {
+        defaultMessage: 'Exclusion',
+        description: 'Exclusion blend mode',
+        id: 'pm.paint.compositingPanel.blend.exclusion'
+    },
+    hue: {
+        defaultMessage: 'Hue',
+        description: 'Hue blend mode',
+        id: 'pm.paint.compositingPanel.blend.hue'
+    },
+    saturation: {
+        defaultMessage: 'Saturation',
+        description: 'Saturation blend mode',
+        id: 'pm.paint.compositingPanel.blend.saturation'
+    },
+    color: {
+        defaultMessage: 'Color',
+        description: 'Color blend mode',
+        id: 'pm.paint.compositingPanel.blend.color'
+    },
+    luminosity: {
+        defaultMessage: 'Luminosity',
+        description: 'Luminosity blend mode',
+        id: 'pm.paint.compositingPanel.blend.luminosity'
+    }
 });
 
 class CompositingPanel extends React.Component {
@@ -123,7 +183,19 @@ class CompositingPanel extends React.Component {
                                     [this.props.intl.formatMessage(messages.normal), 'normal'],
                                     [this.props.intl.formatMessage(messages.multiplicative), 'multiply'],
                                     [this.props.intl.formatMessage(messages.screen), 'screen'],
-                                    [this.props.intl.formatMessage(messages.difference), 'difference']
+                                    [this.props.intl.formatMessage(messages.overlay), 'overlay'],
+                                    [this.props.intl.formatMessage(messages.softLight), 'soft-light'],
+                                    [this.props.intl.formatMessage(messages.hardLight), 'hard-light'],
+                                    [this.props.intl.formatMessage(messages.colorDodge), 'color-dodge'],
+                                    [this.props.intl.formatMessage(messages.colorBurn), 'color-burn'],
+                                    [this.props.intl.formatMessage(messages.lighten), 'lighten'],
+                                    [this.props.intl.formatMessage(messages.darken), 'darken'],
+                                    [this.props.intl.formatMessage(messages.difference), 'difference'],
+                                    [this.props.intl.formatMessage(messages.exclusion), 'exclusion'],
+                                    [this.props.intl.formatMessage(messages.hue), 'hue'],
+                                    [this.props.intl.formatMessage(messages.saturation), 'saturation'],
+                                    [this.props.intl.formatMessage(messages.color), 'color'],
+                                    [this.props.intl.formatMessage(messages.luminosity), 'luminosity'],
                                 ]}
                             />
                         </div>
