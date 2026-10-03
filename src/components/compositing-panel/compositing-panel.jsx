@@ -34,72 +34,72 @@ const messages = defineMessages({
         id: 'pm.paint.compositingPanel.blend.multiplicative'
     },
     screen: {
-        defaultMessage: 'Screen',
+        defaultMessage: 'screen',
         description: 'Screen blend mode',
         id: 'pm.paint.compositingPanel.blend.screen'
     },
     overlay: {
-        defaultMessage: 'Overlay',
+        defaultMessage: 'overlay',
         description: 'Overlay blend mode',
         id: 'pm.paint.compositingPanel.blend.overlay'
     },
     softLight: {
-        defaultMessage: 'Soft Light',
+        defaultMessage: 'soft light',
         description: 'Soft light blend mode',
         id: 'pm.paint.compositingPanel.blend.softLight'
     },
     hardLight: {
-        defaultMessage: 'Hard Light',
+        defaultMessage: 'hard light',
         description: 'Hard light blend mode',
         id: 'pm.paint.compositingPanel.blend.hardLight'
     },
     colorDodge: {
-        defaultMessage: 'Color Dodge',
+        defaultMessage: 'color dodge',
         description: 'Color dodge blend mode',
         id: 'pm.paint.compositingPanel.blend.colorDodge'
     },
     colorBurn: {
-        defaultMessage: 'Color Burn',
+        defaultMessage: 'color burn',
         description: 'Color burn blend mode',
         id: 'pm.paint.compositingPanel.blend.colorBurn'
     },
     darken: {
-        defaultMessage: 'Darken',
+        defaultMessage: 'darken',
         description: 'Darken blend mode',
         id: 'pm.paint.compositingPanel.blend.darken'
     },
     lighten: {
-        defaultMessage: 'Lighten',
+        defaultMessage: 'lighten',
         description: 'Lighten blend mode',
         id: 'pm.paint.compositingPanel.blend.lighten'
     },
     difference: {
-        defaultMessage: 'Difference',
+        defaultMessage: 'difference',
         description: 'Difference blend mode',
         id: 'pm.paint.compositingPanel.blend.difference'
     },
     exclusion: {
-        defaultMessage: 'Exclusion',
+        defaultMessage: 'exclusion',
         description: 'Exclusion blend mode',
         id: 'pm.paint.compositingPanel.blend.exclusion'
     },
     hue: {
-        defaultMessage: 'Hue',
+        defaultMessage: 'hue',
         description: 'Hue blend mode',
         id: 'pm.paint.compositingPanel.blend.hue'
     },
     saturation: {
-        defaultMessage: 'Saturation',
+        defaultMessage: 'saturation',
         description: 'Saturation blend mode',
         id: 'pm.paint.compositingPanel.blend.saturation'
     },
     color: {
-        defaultMessage: 'Color',
+        defaultMessage: 'color',
         description: 'Color blend mode',
         id: 'pm.paint.compositingPanel.blend.color'
     },
     luminosity: {
-        defaultMessage: 'Luminosity',
+        defaultMessage: 'luminosity',
         description: 'Luminosity blend mode',
         id: 'pm.paint.compositingPanel.blend.luminosity'
     }
