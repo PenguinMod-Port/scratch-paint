@@ -22,7 +22,7 @@ class LassoTool extends paper.Tool {
     }
 
     static get MIN_DISTANCE () {
-        return 5;
+        return 0.6;
     }
 
     /**

@@ -4,6 +4,7 @@ import {clearSelection, processLassoSelection} from '../selection';
 import {getRaster} from '../layer';
 import {ART_BOARD_WIDTH, ART_BOARD_HEIGHT} from '../view';
 import {getHitBounds} from '../bitmap';
+import {BitmapModes} from '../../lib/modes';
 
 /** Tool to handle drag selection. A dotted line box appears and everything enclosed is selected. */
 class SelectionLassoTool {
@@ -15,11 +16,13 @@ class SelectionLassoTool {
     constructor (mode, setSelectedItems, clearSelectedItems, minDistance) {
         this.selectionPath = null;
         this.mode = mode;
+        this.bitmap = mode in BitmapModes;
         this.setSelectedItems = setSelectedItems;
         this.clearSelectedItems = clearSelectedItems;
         this.points = [];
         this.minDistance = minDistance;
     }
+
     /**
      * @param {boolean} multiselect Whether to multiselect on mouse down (e.g. shift key held)
      */
@@ -28,7 +31,7 @@ class SelectionLassoTool {
             clearSelection(this.clearSelectedItems);
             this.clearSelectedItems();
         }
-        this.points = [event.point];
+        this.points = [this.bitmap ? event.point.round() : event.point];
     }
     onMouseDrag (event) {
         if (event.event.button > 0) return; // only first mouse button
@@ -36,10 +39,19 @@ class SelectionLassoTool {
             this.selectionPath.remove();
         }
         this.selectionPath = lassoSelect([...this.points, event.point]);
-        if (this.points[this.points.length - 1].getDistance(event.point) >= this.minDistance) {
-            this.points.push(event.point);
+        const lastPoint = this.points[this.points.length - 1];
+        if (lastPoint.getDistance(event.point) >= this.minDistance) {
+            if (this.bitmap) {
+                event.point = event.point.round();
+                if (Math.abs(lastPoint.x - event.point.x) > Math.abs(lastPoint.y - event.point.y)) {
+                    this.points.push(new paper.Point(event.point.x, lastPoint.y));
+                } else {
+                    this.points.push(new paper.Point(lastPoint.x, event.point.y));
+                }
+            } else {
+                this.points.push(event.point);
+            }
         }
-
     }
     onMouseUpVector (event) {
         if (event.event.button > 0) return; // only first mouse button
@@ -53,13 +65,25 @@ class SelectionLassoTool {
     }
     onMouseUpBitmap (event) {
         if (event.event.button > 0) return;
-        if (!this.selectionPath || this.points.length < 3) {
-            if (this.selectionPath) this.selectionPath.remove();
+        if (!this.selectionPath) return;
+        if (this.points.length < 3) {
+            this.selectionPath.remove();
             return;
         }
 
         const bounds = getHitBounds(getRaster(), this.selectionPath.bounds);
+        if (bounds.width === 0 || bounds.height === 0) {
+            this.selectionPath.remove();
+            return;
+        }
+
         const firstPoint = this.points.shift();
+        const lastPoint = this.points[this.points.length - 1];
+        if (Math.abs(lastPoint.x - firstPoint.x) > Math.abs(lastPoint.y - firstPoint.y)) {
+            this.points.push(new paper.Point(firstPoint.x, lastPoint.y));
+        } else {
+            this.points.push(new paper.Point(lastPoint.x, firstPoint.y));
+        }
         
         const canvas = document.createElement('canvas');
         canvas.width = bounds.width;
