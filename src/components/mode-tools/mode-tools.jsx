@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import {changeBrushSize} from '../../reducers/brush-mode';
+import {changeBrushSize, toggleBrushPressure} from '../../reducers/brush-mode';
 import {changeBrushSize as changeEraserSize} from '../../reducers/eraser-mode';
 import {changeBitBrushSize} from '../../reducers/bit-brush-size';
 import {changeBitEraserSize} from '../../reducers/bit-eraser-size';
@@ -34,6 +34,7 @@ import curvedPointIcon from '!../../tw-recolor/build!./icons/curved-point.svg';
 import eraserIcon from '../eraser-mode/eraser.svg';
 import flipHorizontalIcon from '!../../tw-recolor/build!./icons/flip-horizontal.svg';
 import flipVerticalIcon from '!../../tw-recolor/build!./icons/flip-vertical.svg';
+import pressureIcon from '!../../tw-recolor/build!./icons/pressure.svg';
 import straightPointIcon from '!../../tw-recolor/build!./icons/straight-point.svg';
 import bitOvalIcon from '../bit-oval-mode/oval.svg';
 import bitRectIcon from '../bit-rect-mode/rectangle.svg';
@@ -110,6 +111,11 @@ const ModeToolsComponent = props => {
             description: 'Label for the freeform smoothing input',
             id: 'paint.modeTools.freeformSimplify'
         },
+        pressure: {
+            defaultMessage: 'Pressure',
+            description: 'Label for the button that makes brush strokes taper with drawing speed',
+            id: 'paint.modeTools.pressure'
+        },
     });
 
     switch (props.mode) {
@@ -143,6 +149,18 @@ const ModeToolsComponent = props => {
                     value={currentBrushValue}
                     onSubmit={changeFunction}
                 />
+                {props.mode === Modes.BRUSH ?
+                    <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
+                        <LabeledIconButton
+                            highlighted={props.brushPressure}
+                            hideLabel={hideLabel(props.intl.locale)}
+                            imgSrc={pressureIcon}
+                            title={props.intl.formatMessage(messages.pressure)}
+                            onClick={props.onBrushPressureClick}
+                            gray
+                        />
+                    </InputGroup> : null
+                }
             </div>
         );
     }
@@ -338,6 +356,7 @@ const ModeToolsComponent = props => {
 ModeToolsComponent.propTypes = {
     bitBrushSize: PropTypes.number,
     bitEraserSize: PropTypes.number,
+    brushPressure: PropTypes.bool,
     brushValue: PropTypes.number,
     freeformValue: PropTypes.number,
     className: PropTypes.string,
@@ -351,6 +370,7 @@ ModeToolsComponent.propTypes = {
     mode: PropTypes.string.isRequired,
     onBitBrushSliderChange: PropTypes.func.isRequired,
     onBitEraserSliderChange: PropTypes.func.isRequired,
+    onBrushPressureClick: PropTypes.func.isRequired,
     onBrushSliderChange: PropTypes.func.isRequired,
     onCopyToClipboard: PropTypes.func.isRequired,
     onCurvePoints: PropTypes.func.isRequired,
@@ -373,6 +393,7 @@ const mapStateToProps = state => ({
     bitBrushSize: state.scratchPaint.bitBrushSize,
     bitEraserSize: state.scratchPaint.bitEraserSize,
     brushValue: state.scratchPaint.brushMode.brushSize,
+    brushPressure: state.scratchPaint.brushMode.pressureEnabled,
     clipboardItems: state.scratchPaint.clipboard.items,
     eraserValue: state.scratchPaint.eraserMode.brushSize,
     freeformValue: state.scratchPaint.freeformMode.simplifySize,
@@ -380,6 +401,9 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     onBrushSliderChange: brushSize => {
         dispatch(changeBrushSize(brushSize));
+    },
+    onBrushPressureClick: () => {
+        dispatch(toggleBrushPressure());
     },
     onSimplifySliderChange: size => {
         dispatch(changeSimplifySize(size));

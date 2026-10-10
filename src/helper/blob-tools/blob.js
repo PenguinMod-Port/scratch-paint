@@ -1,6 +1,7 @@
 import paper from '@turbowarp/paper';
 import log from '../../log/log';
 import BroadBrushHelper from './broad-brush-helper';
+import SpeedTaper from './speed-taper';
 import SegmentBrushHelper from './segment-brush-helper';
 import {MIXED, styleCursorPreview} from '../../helper/style-path';
 import {clearSelection, getItems} from '../../helper/selection';
@@ -35,6 +36,7 @@ class Blobbiness {
     constructor (onUpdateImage, clearSelectedItems) {
         this.broadBrushHelper = new BroadBrushHelper();
         this.segmentBrushHelper = new SegmentBrushHelper();
+        this.speedTaper = new SpeedTaper();
         this.onUpdateImage = onUpdateImage;
         this.clearSelectedItems = clearSelectedItems;
 
@@ -53,6 +55,7 @@ class Blobbiness {
      * @param {?string} options.fillColor Color of the brush stroke.
      * @param {?string} options.strokeColor Color of the brush outline.
      * @param {?number} options.strokeWidth Width of the brush outline.
+     * @param {?boolean} options.pressureEnabled When true, taper the stroke by pointer speed.
      */
     setOptions (options) {
         const oldFillColor = this.options ? this.options.fillColor : 'black';
@@ -79,6 +82,7 @@ class Blobbiness {
      * @param {?string} options.fillColor Color of the brush stroke.
      * @param {?string} options.strokeColor Color of the brush outline.
      * @param {?number} options.strokeWidth Width of the brush outline.
+     * @param {?boolean} options.pressureEnabled When true, taper the stroke by pointer speed.
      */
     activateTool (options) {
         this.tool = new paper.Tool();
@@ -89,6 +93,7 @@ class Blobbiness {
 
         const blob = this;
         this.tool.onMouseMove = function (event) {
+            blob.speedTaper.update(event.point, event.event.timeStamp);
             blob.resizeCursorIfNeeded(event.point);
             styleCursorPreview(blob.cursorPreview, blob.options);
             blob.cursorPreview.bringToFront();
@@ -99,6 +104,8 @@ class Blobbiness {
             blob.resizeCursorIfNeeded(event.point);
             if (event.event.button > 0) return; // only first mouse button
             this.active = true;
+
+            blob.speedTaper.reset();
 
             const pressureOptions = blob.getPressureOptions();
             if (blob.options.brushSize < Blobbiness.THRESHOLD) {
@@ -114,6 +121,7 @@ class Blobbiness {
 
         this.tool.onMouseDrag = function (event) {
             if (event.event.button > 0 || !this.active) return; // only first mouse button
+            blob.speedTaper.update(event.point, event.event.timeStamp);
             const pressureOptions = blob.getPressureOptions();
             if (blob.brush === Blobbiness.BROAD) {
                 blob.broadBrushHelper.onBroadMouseDrag(event, blob.tool, pressureOptions);
@@ -161,8 +169,8 @@ class Blobbiness {
 
     /**
      * Returns the drawing options to use for the current event, scaling the brush
-     * size by the pen pressure when drawing with a pen. This is what makes pen
-     * strokes vary in width as the pen is pressed harder or softer.
+     * size down by how hard the pen is pressed when drawing with a real stylus,
+     * or by how fast the pointer is moving when the speed pressure option is on.
      * @return {!object} options to pass to the brush helpers
      */
     getPressureOptions () {
@@ -170,18 +178,26 @@ class Blobbiness {
             return this.options;
         }
         const pressure = getPenPressure();
-        if (pressure === null) {
+        if (pressure !== null) {
+            // Browsers report pen pressure in 0..1. Map it so a firm press (>= 0.5)
+            // draws at the full brush size while lighter presses draw thinner, and
+            // always keep at least a quarter of the brush size so the stroke stays
+            // visible. Pens that don't support pressure report a constant 0.5, so
+            // this also keeps those strokes at full size.
+            const scale = Math.max(0.25, Math.min(1, pressure * 2));
+            return {
+                ...this.options,
+                brushSize: this.options.brushSize * scale
+            };
+        }
+        if (!this.options.pressureEnabled) {
             return this.options;
         }
-        // Browsers report pen pressure in 0..1. Map it so a firm press (>= 0.5)
-        // draws at the full brush size while lighter presses draw thinner, and
-        // always keep at least a quarter of the brush size so the stroke stays
-        // visible. Pens that don't support pressure report a constant 0.5, so
-        // this also keeps those strokes at full size.
-        const scale = Math.max(0.25, Math.min(1, pressure * 2));
+        // Slow or stationary pointers keep the full brush size, faster ones taper
+        // down toward SpeedTaper.MIN_SCALE.
         return {
             ...this.options,
-            brushSize: this.options.brushSize * scale
+            brushSize: this.options.brushSize * this.speedTaper.getScale()
         };
     }
 
