@@ -4,6 +4,7 @@ import addonUtilReducer from './addon-util';
 import bitBrushSizeReducer from './bit-brush-size';
 import bitEraserSizeReducer from './bit-eraser-size';
 import brushModeReducer from './brush-mode';
+import brushPressureReducer from './brush-pressure';
 import eraserModeReducer from './eraser-mode';
 import rectModeReducer from './rect-mode';
 import roundedRectModeReducer from './rounded-rect-mode';
@@ -38,6 +39,7 @@ export default combineReducers({
     bitBrushSize: bitBrushSizeReducer,
     bitEraserSize: bitEraserSizeReducer,
     brushMode: brushModeReducer,
+    brushPressure: brushPressureReducer,
     color: colorReducer,
     clipboard: clipboardReducer,
     cursor: cursorReducer,

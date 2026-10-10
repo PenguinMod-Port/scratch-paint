@@ -41,6 +41,7 @@ class BrushMode extends React.Component {
                 fillColor: fillColor.primary,
                 strokeColor: strokeColor.primary,
                 strokeWidth,
+                speedPressure: nextProps.brushPressure,
                 ...nextProps.brushModeState
             });
         }
@@ -65,6 +66,7 @@ class BrushMode extends React.Component {
         }
         this.blob.activateTool({
             isEraser: false,
+            speedPressure: this.props.brushPressure,
             ...this.props.colorState,
             ...this.props.brushModeState
         });
@@ -86,6 +88,7 @@ BrushMode.propTypes = {
     brushModeState: PropTypes.shape({
         brushSize: PropTypes.number.isRequired
     }),
+    brushPressure: PropTypes.bool,
     clearGradient: PropTypes.func.isRequired,
     clearSelectedItems: PropTypes.func.isRequired,
     colorState: PropTypes.shape({
@@ -101,6 +104,7 @@ BrushMode.propTypes = {
 
 const mapStateToProps = state => ({
     brushModeState: state.scratchPaint.brushMode,
+    brushPressure: state.scratchPaint.brushPressure,
     colorState: state.scratchPaint.color,
     isBrushModeActive: state.scratchPaint.mode === Modes.BRUSH
 });
