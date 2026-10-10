@@ -3,8 +3,7 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import {changeBrushSize} from '../../reducers/brush-mode';
-import {toggleBrushPressure} from '../../reducers/brush-pressure';
+import {changeBrushSize, toggleBrushPressure} from '../../reducers/brush-mode';
 import {changeBrushSize as changeEraserSize} from '../../reducers/eraser-mode';
 import {changeBitBrushSize} from '../../reducers/bit-brush-size';
 import {changeBitEraserSize} from '../../reducers/bit-eraser-size';
@@ -394,7 +393,7 @@ const mapStateToProps = state => ({
     bitBrushSize: state.scratchPaint.bitBrushSize,
     bitEraserSize: state.scratchPaint.bitEraserSize,
     brushValue: state.scratchPaint.brushMode.brushSize,
-    brushPressure: state.scratchPaint.brushPressure,
+    brushPressure: state.scratchPaint.brushMode.pressureEnabled,
     clipboardItems: state.scratchPaint.clipboard.items,
     eraserValue: state.scratchPaint.eraserMode.brushSize,
     freeformValue: state.scratchPaint.freeformMode.simplifySize,

@@ -55,7 +55,7 @@ class Blobbiness {
      * @param {?string} options.fillColor Color of the brush stroke.
      * @param {?string} options.strokeColor Color of the brush outline.
      * @param {?number} options.strokeWidth Width of the brush outline.
-     * @param {?boolean} options.speedPressure When true, taper the stroke by pointer speed.
+     * @param {?boolean} options.pressureEnabled When true, taper the stroke by pointer speed.
      */
     setOptions (options) {
         const oldFillColor = this.options ? this.options.fillColor : 'black';
@@ -82,7 +82,7 @@ class Blobbiness {
      * @param {?string} options.fillColor Color of the brush stroke.
      * @param {?string} options.strokeColor Color of the brush outline.
      * @param {?number} options.strokeWidth Width of the brush outline.
-     * @param {?boolean} options.speedPressure When true, taper the stroke by pointer speed.
+     * @param {?boolean} options.pressureEnabled When true, taper the stroke by pointer speed.
      */
     activateTool (options) {
         this.tool = new paper.Tool();
@@ -190,7 +190,7 @@ class Blobbiness {
                 brushSize: this.options.brushSize * scale
             };
         }
-        if (!this.options.speedPressure) {
+        if (!this.options.pressureEnabled) {
             return this.options;
         }
         // Slow or stationary pointers keep the full brush size, faster ones taper
