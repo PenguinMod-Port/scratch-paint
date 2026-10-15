@@ -3,10 +3,10 @@ name: Deploy playground
 on:
   workflow_dispatch:
   push:
-    branches: [develop]
+  pull_request:
 
 concurrency:
-  group: "deploy"
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
   cancel-in-progress: true
 
 jobs:
@@ -38,6 +38,7 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/develop'
     steps:
     - name: Deploy to GitHub Pages
       id: deployment
