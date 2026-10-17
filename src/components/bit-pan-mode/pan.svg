@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <path style="stroke-linecap: round; stroke-width: 1.666; stroke-linejoin: round; fill: rgb(87, 94, 117);" d="M 11 18 L 7 18 L 7 17 L 6 17 L 6 16 L 5 16 L 5 15 L 4 15 L 4 14 L 4 12 L 6 12 L 6 13 L 7 13 L 7 14 L 8 14 L 8 12 L 7 12 L 7 10 L 6 10 L 6 8 L 5 8 L 5 7 L 4 7 L 4 6 L 3 6 L 3 5 L 4 5 L 4 4 L 5 4 L 5 5 L 6 5 L 6 6 L 7 6 L 7 7 L 8 7 L 8 9 L 9 9 L 9 10 L 10 10 L 10 8 L 9 8 L 9 6 L 8 6 L 8 5 L 7 5 L 7 4 L 6 4 L 6 2 L 8 2 L 8 3 L 9 3 L 9 4 L 10 4 L 10 6 L 11 6 L 11 7 L 12 7 L 12 9 L 13 9 L 13 6 L 12 6 L 12 5 L 11 5 L 11 3 L 13 3 L 13 4 L 14 4 L 14 5 L 15 5 L 15 8 L 16 8 L 16 11 L 17 11 L 17 15 L 16 15 L 16 17 L 14 17 L 14 18 L 11 18 Z"></path>
+  <path style="stroke-linecap: round; stroke-width: 1.666; stroke-linejoin: round; fill: rgb(87, 94, 117);" d="M11 18H8V17H6V16H5V15H4V14H3V11H5v1H6v1H7V11H6V3H8V9H9V2h1V3h1V9h1V3h1V4h1v6h1V4h1V5h1V16H16v1H15v1Z"></path>
 </svg>
