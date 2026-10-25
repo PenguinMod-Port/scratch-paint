@@ -85,8 +85,9 @@ const messages = defineMessages({
 
 const PaintEditorComponent = props => (
     <div
-        ref={props.containerRef}
-        className={styles.editorContainer}
+        className={classNames(styles.editorContainer, {
+            [styles.fullscreen]: props.isFullscreen
+        })}
         dir={props.rtl ? 'rtl' : 'ltr'}
         data-paint-theme={props.theme}
     >
@@ -108,7 +109,7 @@ const PaintEditorComponent = props => (
                         className={styles.fullscreenButton}
                         onClick={props.onToggleFullscreen}
                     >
-                        <img src={fullscreenIcon} />
+                        <img src={props.isFullscreen ? unfullscreenIcon : fullscreenIcon} />
                     </Button>
                 </div>
                 {/* Second Row */}
@@ -442,6 +443,7 @@ PaintEditorComponent.propTypes = {
     imageId: PropTypes.string,
     intl: intlShape,
     isEyeDropping: PropTypes.bool,
+    isFullscreen: PropTypes.bool,
     name: PropTypes.string,
     onChangeTheme: PropTypes.func.isRequired,
     onManageFonts: PropTypes.func,

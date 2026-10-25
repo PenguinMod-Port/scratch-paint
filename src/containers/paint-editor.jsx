@@ -96,9 +96,9 @@ class PaintEditor extends React.Component {
         ]);
         this.state = {
             canvas: null,
-            colorInfo: null
+            colorInfo: null,
+            fullscreen: false
         };
-        this.containerRef = React.createRef();
         this.props.setLayout(this.props.rtl ? 'rtl' : 'ltr');
         this.props.onCustomFontsChanged(this.props.customFonts);
         if (this.props.settingsStore) this.props.onSettingsStoreChanged(this.props.settingsStore);
@@ -268,13 +268,18 @@ class PaintEditor extends React.Component {
     handleSetSelectedItems () {
         this.props.setSelectedItems(this.props.format);
     }
-    async handleToggleFullscreen() {
+    async handleToggleFullscreen(event) {
         try {
-            if (document.fullscreenElement) {
-                await document.exitFullscreen();
+            if (event instanceof Event || document.fullscreenElement) {
+                if (document.fullscreenElement) await document.exitFullscreen();
+                document.removeEventListener('fullscreenchange', this.handleToggleFullscreen);
+                this.setState({fullscreen: false});
             } else {
-                await this.containerRef.current.requestFullscreen();
+                await document.body.requestFullscreen();
+                this.setState({fullscreen: true});
+                requestAnimationFrame(_ => document.addEventListener('fullscreenchange', this.handleToggleFullscreen));
             }
+            queueMicrotask(() => window.dispatchEvent(new Event('resize')));
         } catch (e) {}
     }
     setCanvas (canvas) {
@@ -353,8 +358,6 @@ class PaintEditor extends React.Component {
     render () {
         return (
             <PaintEditorComponent
-                containerRef={this.containerRef}
-
                 canRedo={this.props.shouldShowRedo}
                 canUndo={this.props.shouldShowUndo}
                 canvas={this.state.canvas}
@@ -364,6 +367,7 @@ class PaintEditor extends React.Component {
                 imageFormat={this.props.imageFormat}
                 imageId={this.props.imageId}
                 isEyeDropping={this.props.isEyeDropping}
+                isFullscreen={this.state.fullscreen}
                 name={this.props.name}
                 rotationCenterX={this.props.rotationCenterX}
                 rotationCenterY={this.props.rotationCenterY}
