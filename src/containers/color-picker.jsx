@@ -51,10 +51,9 @@ class ColorPicker extends React.Component {
         super(props);
         bindAll(this, [
             'getHsv',
-            'handleChangeGradientTypeHorizontal',
+            'handleChangeGradientTypeLinear',
             'handleChangeGradientTypeRadial',
             'handleChangeGradientTypeSolid',
-            'handleChangeGradientTypeVertical',
             'handleHueChange',
             'handleSaturationChange',
             'handleBrightnessChange',
@@ -164,17 +163,14 @@ class ColorPicker extends React.Component {
             this.props.onChangeColor
         );
     }
-    handleChangeGradientTypeHorizontal () {
-        this.props.onChangeGradientType(GradientTypes.HORIZONTAL);
+    handleChangeGradientTypeLinear () {
+        this.props.onChangeGradientType(GradientTypes.LINEAR);
     }
     handleChangeGradientTypeRadial () {
         this.props.onChangeGradientType(GradientTypes.RADIAL);
     }
     handleChangeGradientTypeSolid () {
         this.props.onChangeGradientType(GradientTypes.SOLID);
-    }
-    handleChangeGradientTypeVertical () {
-        this.props.onChangeGradientType(GradientTypes.VERTICAL);
     }
     render () {
         return (
@@ -196,10 +192,9 @@ class ColorPicker extends React.Component {
                 shouldShowGradientTools={this.props.shouldShowGradientTools}
                 onActivateEyeDropper={this.handleActivateEyeDropper}
                 onBrightnessChange={this.handleBrightnessChange}
-                onChangeGradientTypeHorizontal={this.handleChangeGradientTypeHorizontal}
+                onChangeGradientTypeLinear={this.handleChangeGradientTypeLinear}
                 onChangeGradientTypeRadial={this.handleChangeGradientTypeRadial}
                 onChangeGradientTypeSolid={this.handleChangeGradientTypeSolid}
-                onChangeGradientTypeVertical={this.handleChangeGradientTypeVertical}
                 onHueChange={this.handleHueChange}
                 onSaturationChange={this.handleSaturationChange}
                 onSelectColor={this.props.onSelectColor}

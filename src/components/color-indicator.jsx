@@ -35,6 +35,7 @@ const ColorIndicatorComponent = props => (
                     color={props.color}
                     color2={props.color2}
                     gradientType={props.gradientType}
+                    gradientAngle={props.gradientAngle}
                     onClick={props.onOpenColor}
                     outline={props.outline}
                 />
@@ -50,6 +51,7 @@ ColorIndicatorComponent.propTypes = {
     color2: PropTypes.string,
     colorModalVisible: PropTypes.bool.isRequired,
     gradientType: PropTypes.oneOf(Object.keys(GradientTypes)).isRequired,
+    gradientAngle: PropTypes.number,
     label: PropTypes.string.isRequired,
     onChangeColor: PropTypes.func.isRequired,
     onChangeGradientType: PropTypes.func.isRequired,

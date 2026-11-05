@@ -33,6 +33,7 @@ const mapStateToProps = state => ({
     colorModalVisible: state.scratchPaint.modals.strokeColor,
     format: state.scratchPaint.format,
     gradientType: state.scratchPaint.color.strokeColor.gradientType,
+    gradientAngle: state.scratchPaint.color.strokeColor.gradientAngle,
     isEyeDropping: state.scratchPaint.color.eyeDropper.active,
     mode: state.scratchPaint.mode,
     shouldShowGradientTools: state.scratchPaint.mode in GradientToolsModes,

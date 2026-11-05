@@ -83,6 +83,7 @@ const makeColorIndicator = (label, isStroke) => {
             // Apply color and update redux, but do not update svg until picker closes.
             const isDifferent = applyGradientTypeToSelection(
                 gradientType,
+                this.props.gradientAngle,
                 isStroke || (formatIsBitmap && !this.props.fillBitmapShapes),
                 this.props.textEditTarget);
             this._hasChanged = this._hasChanged || isDifferent;
@@ -154,6 +155,7 @@ const makeColorIndicator = (label, isStroke) => {
         fillBitmapShapes: PropTypes.bool.isRequired,
         format: PropTypes.oneOf(Object.keys(Formats)),
         gradientType: PropTypes.oneOf(Object.keys(GradientTypes)).isRequired,
+        gradientAngle: PropTypes.number,
         intl: intlShape,
         isEyeDropping: PropTypes.bool.isRequired,
         onChangeColorIndex: PropTypes.func.isRequired,

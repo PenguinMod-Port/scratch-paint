@@ -31,6 +31,7 @@ const mapStateToProps = state => ({
     fillBitmapShapes: state.scratchPaint.fillBitmapShapes,
     format: state.scratchPaint.format,
     gradientType: state.scratchPaint.color.fillColor.gradientType,
+    gradientAngle: state.scratchPaint.color.fillColor.gradientAngle,
     isEyeDropping: state.scratchPaint.color.eyeDropper.active,
     mode: state.scratchPaint.mode,
     shouldShowGradientTools: state.scratchPaint.mode in GradientToolsModes,

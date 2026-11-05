@@ -24,6 +24,7 @@ class FillTool extends paper.Tool {
         this.color = null;
         this.color2 = null;
         this.gradientType = null;
+        this.gradientAngle = 90;
         this.active = false;
     }
     setColor (color) {
@@ -34,6 +35,9 @@ class FillTool extends paper.Tool {
     }
     setGradientType (gradientType) {
         this.gradientType = gradientType;
+    }
+    setGradientAngle (gradientAngle) {
+        this.gradientAngle = gradientAngle;
     }
     handleMouseDown (event) {
         this.paint(event);
@@ -84,6 +88,7 @@ class FillTool extends paper.Tool {
                     this.color,
                     this.color2,
                     this.gradientType,
+                    this.gradientAngle,
                     gradient.bounds,
                     event.point);
                 const rasterGradient = gradient.rasterize(getRaster().resolution.width, false /* insert */);

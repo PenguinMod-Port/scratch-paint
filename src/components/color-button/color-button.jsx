@@ -10,14 +10,13 @@ import styles from './color-button.css';
 import GradientTypes from '../../lib/gradient-types';
 import log from '../../log/log';
 
-const colorToBackground = (color, color2, gradientType) => {
+const colorToBackground = (color, color2, gradientType, gradientAngle) => {
     if (color === MIXED || (gradientType !== GradientTypes.SOLID && color2 === MIXED)) return 'white';
     if (color === null) color = 'white';
     if (color2 === null) color2 = 'white';
     switch (gradientType) {
     case GradientTypes.SOLID: return color;
-    case GradientTypes.HORIZONTAL: return `linear-gradient(to right, ${color}, ${color2})`;
-    case GradientTypes.VERTICAL: return `linear-gradient(${color}, ${color2})`;
+    case GradientTypes.LINEAR: return `linear-gradient(${gradientAngle}deg, ${color}, ${color2})`;
     case GradientTypes.RADIAL: return `radial-gradient(${color}, ${color2})`;
     default: log.error(`Unrecognized gradient type: ${gradientType}`);
     }
@@ -33,7 +32,7 @@ const ColorButtonComponent = props => (
                 [styles.outlineSwatch]: props.outline && !(props.color === MIXED)
             })}
             style={{
-                background: colorToBackground(props.color, props.color2, props.gradientType)
+                background: colorToBackground(props.color, props.color2, props.gradientType, props.gradientAngle)
             }}
         >
             {props.color === null && (props.gradientType === GradientTypes.SOLID || props.color2 === null) ? (
@@ -58,6 +57,7 @@ ColorButtonComponent.propTypes = {
     color: PropTypes.string,
     color2: PropTypes.string,
     gradientType: PropTypes.oneOf(Object.keys(GradientTypes)).isRequired,
+    gradientAngle: PropTypes.number,
     onClick: PropTypes.func.isRequired,
     outline: PropTypes.bool.isRequired
 };

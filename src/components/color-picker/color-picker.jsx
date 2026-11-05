@@ -105,24 +105,12 @@ class ColorPickerComponent extends React.Component {
                                 />
                                 <TWRenderRecoloredImage
                                     className={classNames({
-                                        [styles.inactiveGradient]:
-                                            this.props.gradientType !== GradientTypes.HORIZONTAL,
+                                        [styles.inactiveGradient]: this.props.gradientType !== GradientTypes.LINEAR,
                                         [styles.clickable]: true
                                     })}
                                     draggable={false}
                                     src={fillHorzGradientIcon}
-                                    onClick={this.props.onChangeGradientTypeHorizontal}
-                                    width={20}
-                                    height={20}
-                                />
-                                <TWRenderRecoloredImage
-                                    className={classNames({
-                                        [styles.inactiveGradient]: this.props.gradientType !== GradientTypes.VERTICAL,
-                                        [styles.clickable]: true
-                                    })}
-                                    draggable={false}
-                                    src={fillVertGradientIcon}
-                                    onClick={this.props.onChangeGradientTypeVertical}
+                                    onClick={this.props.onChangeGradientTypeLinear}
                                     width={20}
                                     height={20}
                                 />
@@ -380,10 +368,9 @@ ColorPickerComponent.propTypes = {
     mode: PropTypes.oneOf(Object.keys(Modes)),
     onActivateEyeDropper: PropTypes.func.isRequired,
     onBrightnessChange: PropTypes.func.isRequired,
-    onChangeGradientTypeHorizontal: PropTypes.func.isRequired,
+    onChangeGradientTypeLinear: PropTypes.func.isRequired,
     onChangeGradientTypeRadial: PropTypes.func.isRequired,
     onChangeGradientTypeSolid: PropTypes.func.isRequired,
-    onChangeGradientTypeVertical: PropTypes.func.isRequired,
     onHueChange: PropTypes.func.isRequired,
     onSaturationChange: PropTypes.func.isRequired,
     onSelectColor: PropTypes.func.isRequired,
