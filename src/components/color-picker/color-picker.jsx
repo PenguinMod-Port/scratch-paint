@@ -26,6 +26,7 @@ import Input from '../forms/input.jsx';
 import {makeAlphaComponent} from '../../lib/tw-color-utils';
 import TWColorReadout from '../tw-color-readout/tw-color-readout.jsx';
 import TWRenderRecoloredImage from '../../tw-recolor/render.jsx';
+import SimpleDial from '../simple-dial/simple-dial.jsx';
 
 const BufferedInput = BufferedInputHOC(Input);
 
@@ -199,6 +200,27 @@ class ColorPickerComponent extends React.Component {
                                 </div>
                             </div>
                         )}
+                        {this.props.gradientType !== GradientTypes.LINEAR ? null : (
+                            <div className={classNames(styles.row, styles.angleRow)}>
+                                <FormattedMessage
+                                    defaultMessage="Direction"
+                                    id="pm.paint.paintEditor.gradientDirection"
+                                />
+                                <BufferedInput
+                                    type="number"
+                                    className={styles.angleInput}
+                                    value={(Math.round(this.props.gradientAngle) + 180) % 360 - 180}
+                                    step={1}
+                                    min={-180}
+                                    max={180}
+                                    onSubmit={this.props.onChangeGradientAngle}
+                                />
+                                <SimpleDial
+                                    direction={this.props.gradientAngle}
+                                    onChange={this.props.onChangeGradientAngle}
+                                />
+                            </div>
+                        )}
                     </div>
                 ) : null}
                 <div className={styles.row}>
@@ -362,6 +384,7 @@ ColorPickerComponent.propTypes = {
     color2: PropTypes.string,
     colorIndex: PropTypes.number.isRequired,
     gradientType: PropTypes.oneOf(Object.keys(GradientTypes)).isRequired,
+    gradientAngle: PropTypes.number.isRequired,
     hue: PropTypes.number.isRequired,
     intl: intlShape.isRequired,
     isEyeDropping: PropTypes.bool.isRequired,
@@ -371,6 +394,7 @@ ColorPickerComponent.propTypes = {
     onChangeGradientTypeLinear: PropTypes.func.isRequired,
     onChangeGradientTypeRadial: PropTypes.func.isRequired,
     onChangeGradientTypeSolid: PropTypes.func.isRequired,
+    onChangeGradientAngle: PropTypes.func.isRequired,
     onHueChange: PropTypes.func.isRequired,
     onSaturationChange: PropTypes.func.isRequired,
     onSelectColor: PropTypes.func.isRequired,

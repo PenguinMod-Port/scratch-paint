@@ -102,12 +102,7 @@ const createGradientObject = function (color1, color2, gradientType, gradientAng
     let end;
     switch (gradientType) {
         case GradientTypes.LINEAR: {
-            const center = bounds.center;
-            const radians = (gradientAngle - 90) * Math.PI / 180
-            const gradientSize = Math.max(Math.abs(bounds.width * Math.cos(radians)) + Math.abs(bounds.height * Math.sin(radians)), minSize);
-            const offset = new paper.Point({ angle: gradientAngle - 90, length: gradientSize / 2 });
-            start = center.subtract(offset);
-            end = center.add(offset);
+            [start, end] = _linearGradientPoints(color1, color2, gradientAngle, bounds, minSize);
             break;
         }
 
@@ -129,6 +124,14 @@ const createGradientObject = function (color1, color2, gradientType, gradientAng
         destination: end
     };
 };
+
+const _linearGradientPoints = function (color1, color2, gradientAngle, bounds, minSize) {
+    const center = bounds.center;
+    const radians = (gradientAngle - 90) * Math.PI / 180
+    const gradientSize = Math.max(Math.abs(bounds.width * Math.cos(radians)) + Math.abs(bounds.height * Math.sin(radians)), minSize);
+    const offset = new paper.Point({ angle: gradientAngle - 90, length: gradientSize / 2 });
+    return [center.subtract(offset), center.add(offset)];
+}
 
 /**
  * Called when setting an item's color
@@ -339,6 +342,101 @@ const applyGradientTypeToSelection = function (gradientType, gradientAngle, appl
     }
     return changed;
 };
+
+const applyGradientAngleToSelection = function(gradientType, gradientAngle, applyToStroke, textEditTargetId) {
+    const items = _getColorStateListeners(textEditTargetId);
+    let changed = false;
+    for (let item of items) {
+        if (item.parent instanceof paper.CompoundPath) {
+            item = item.parent;
+        }
+
+        const itemColorProp = applyToStroke ? 'strokeColor' : 'fillColor';
+        const itemColor = item[itemColorProp];
+
+        const hasGradient = itemColor && itemColor.gradient;
+
+        if (gradientType !== GradientTypes.LINEAR || !hasGradient || itemColor.radial) {
+            continue;
+        }
+
+        let itemColor1;
+        if (itemColor === null || itemColor.alpha === 0) {
+            // Transparent
+            itemColor1 = null;
+        } else if (!hasGradient) {
+            // Solid color
+            itemColor1 = itemColor.toCSS();
+        } else if (!itemColor.gradient.stops[0] || itemColor.gradient.stops[0].color.alpha === 0) {
+            // Gradient where first color is transparent
+            itemColor1 = null;
+        } else {
+            // Gradient where first color is not transparent
+            itemColor1 = itemColor.gradient.stops[0].color.toCSS();
+        }
+
+        let itemColor2;
+        if (!hasGradient || !itemColor.gradient.stops[1]) {
+            // If item color is solid or a gradient that has no 2nd color, set the 2nd color based on the first color
+            itemColor2 = generateSecondaryColor(itemColor1);
+        } else if (itemColor.gradient.stops[1].color.alpha === 0) {
+            // Gradient has 2nd color which is transparent
+            itemColor2 = null;
+        } else {
+            // Gradient has 2nd color which is not transparent
+            itemColor2 = itemColor.gradient.stops[1].color.toCSS();
+        }
+
+        if (gradientType === GradientTypes.SOLID) {
+            if (itemColor && itemColor.gradient) {
+                changed = true;
+                item[itemColorProp] = itemColor1;
+            }
+            continue;
+        }
+
+        // If this is a stroke, we don't display it as having a gradient in the color picker
+        // if there's no stroke width. Then treat it as if it doesn't have a gradient.
+        let hasDisplayGradient = hasGradient;
+        if (applyToStroke) hasDisplayGradient = hasGradient && item.strokeWidth > 0;
+        if (!hasDisplayGradient) {
+            const noColorOriginally = !itemColor ||
+                (itemColor.gradient &&
+                itemColor.gradient.stops &&
+                itemColor.gradient.stops[0].color.alpha === 0);
+            const addingStroke = applyToStroke && item.strokeWidth === 0;
+            const hasGradientNow = itemColor1 || itemColor2;
+            if ((noColorOriginally || addingStroke) && hasGradientNow) {
+                if (applyToStroke) {
+                    // Make outline visible
+                    item.strokeWidth = 1;
+                }
+                // Make the gradient black to white
+                itemColor1 = 'black';
+                itemColor2 = 'white';
+            }
+        }
+
+        if (itemColor1 === null) {
+            itemColor1 = getColorStringForTransparent(itemColor2);
+        }
+        if (itemColor2 === null) {
+            itemColor2 = getColorStringForTransparent(itemColor1);
+        }
+
+        changed = true;
+        const [start, end] = _linearGradientPoints(
+            itemColor1,
+            itemColor2,
+            gradientAngle,
+            item.bounds,
+            item.strokeWidth
+        );
+        itemColor.origin = start;
+        itemColor.destination = end;
+    }
+    return changed;
+}
 
 /**
  * Called when setting stroke width
@@ -590,6 +688,7 @@ const styleShape = function (path, options) {
 export {
     applyColorToSelection,
     applyGradientTypeToSelection,
+    applyGradientAngleToSelection,
     applyStrokeWidthToSelection,
     createGradientObject,
     getColorsFromSelection,

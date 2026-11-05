@@ -2,7 +2,7 @@ import {connect} from 'react-redux';
 import {defineMessages} from 'react-intl';
 
 import {changeColorIndex} from '../reducers/color-index';
-import {changeStrokeColor, changeStrokeColor2, changeStrokeGradientType} from '../reducers/stroke-style';
+import {changeStrokeColor, changeStrokeColor2, changeStrokeGradientType, changeStrokeGradientAngle} from '../reducers/stroke-style';
 import {changeStrokeWidth} from '../reducers/stroke-width';
 import {openStrokeColor, closeStrokeColor} from '../reducers/modals';
 import {getSelectedLeafItems} from '../helper/selection';
@@ -62,6 +62,9 @@ const mapDispatchToProps = dispatch => ({
     },
     onChangeGradientType: gradientType => {
         dispatch(changeStrokeGradientType(gradientType));
+    },
+    onChangeGradientAngle: gradientAngle => {
+        dispatch(changeStrokeGradientType(gradientAngle));
     },
     setSelectedItems: format => {
         dispatch(setSelectedItems(getSelectedLeafItems(), isBitmap(format)));

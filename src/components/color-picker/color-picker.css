@@ -32,6 +32,30 @@ body :global(.Popover) {
     cursor: pointer;
 }
 
+.angle-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 8px;
+    font-weight: bold;
+    font-size: 0.65rem;
+    gap: 8px;
+}
+
+.angle-input {
+    width: 28px;
+    height: 16px !important;
+    text-align: center !important;
+    -moz-appearance: textfield;
+    font: inherit !important;
+    box-sizing: content-box;
+}
+.angle-input::-webkit-outer-spin-button,
+.angle-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .swatch-row {
     display: flex;
     flex-direction: row;

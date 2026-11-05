@@ -2,7 +2,7 @@ import {connect} from 'react-redux';
 import {defineMessages} from 'react-intl';
 
 import {changeColorIndex} from '../reducers/color-index';
-import {changeFillColor, changeFillColor2} from '../reducers/fill-style';
+import {changeFillColor, changeFillColor2, changeFillGradientAngle} from '../reducers/fill-style';
 import {changeGradientType} from '../reducers/fill-mode-gradient-type';
 import {openFillColor, closeFillColor} from '../reducers/modals';
 import {getSelectedLeafItems} from '../helper/selection';
@@ -57,6 +57,9 @@ const mapDispatchToProps = dispatch => ({
     },
     onChangeGradientType: gradientType => {
         dispatch(changeGradientType(gradientType));
+    },
+    onChangeGradientAngle: gradientAngle => {
+        dispatch(changeFillGradientAngle(gradientAngle));
     },
     setSelectedItems: format => {
         dispatch(setSelectedItems(getSelectedLeafItems(), isBitmap(format)));

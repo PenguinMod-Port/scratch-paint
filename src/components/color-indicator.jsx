@@ -20,9 +20,11 @@ const ColorIndicatorComponent = props => (
                     color={props.color}
                     color2={props.color2}
                     gradientType={props.gradientType}
+                    gradientAngle={props.gradientAngle}
                     shouldShowGradientTools={props.shouldShowGradientTools}
                     onChangeColor={props.onChangeColor}
                     onChangeGradientType={props.onChangeGradientType}
+                    onChangeGradientAngle={props.onChangeGradientAngle}
                     onSwap={props.onSwap}
                 />
             }
@@ -55,6 +57,7 @@ ColorIndicatorComponent.propTypes = {
     label: PropTypes.string.isRequired,
     onChangeColor: PropTypes.func.isRequired,
     onChangeGradientType: PropTypes.func.isRequired,
+    onChangeGradientAngle: PropTypes.func.isRequired,
     onCloseColor: PropTypes.func.isRequired,
     onOpenColor: PropTypes.func.isRequired,
     onSwap: PropTypes.func.isRequired,
