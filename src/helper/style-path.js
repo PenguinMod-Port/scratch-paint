@@ -504,7 +504,9 @@ const getColorsFromSelection = function (selectedItems, bitmapMode) {
     let selectionStrokeWidth;
     let selectionThickness;
     let selectionFillGradientType;
+    let selectionFillGradientAngle = 90;
     let selectionStrokeGradientType;
+    let selectionStrokeGradientAngle = 90;
     let firstChild = true;
 
     for (let item of selectedItems) {
@@ -517,7 +519,9 @@ const getColorsFromSelection = function (selectedItems, bitmapMode) {
         let itemStrokeColorString;
         let itemStrokeColor2String;
         let itemFillGradientType = GradientTypes.SOLID;
+        let itemFillGradientAngle = 90;
         let itemStrokeGradientType = GradientTypes.SOLID;
+        let itemStrokeGradientAngle = 90;
 
         if (!isGroup(item)) {
             if (item.fillColor) {
@@ -620,11 +624,29 @@ const getColorsFromSelection = function (selectedItems, bitmapMode) {
             }
         }
     }
+        if (selectedItems && selectedItems.length) {
+        let firstItem = selectedItems[0];
+        if (firstItem.parent instanceof paper.CompoundPath) firstItem = firstItem.parent;
+
+        if (selectionFillGradientType === GradientTypes.LINEAR) {
+            // Stroke color is fill color in bitmap if fill color is missing
+            // TODO: this whole "treat horizontal/vertical gradients specially" logic is janky; refactor at some point
+            const firstItemColor = (bitmapMode && firstItem.strokeColor) ? firstItem.strokeColor : firstItem.fillColor;
+            const direction = firstItemColor.destination.subtract(firstItemColor.origin);
+            selectionFillGradientAngle = direction.angle + 90;
+        }
+
+        if (selectionStrokeGradientType === GradientTypes.LINEAR) {
+            const direction = firstItem.strokeColor.destination.subtract(firstItem.strokeColor.origin);
+            selectionFillGradientAngle = direction.angle + 90;
+        }
+    }
     if (bitmapMode) {
         return {
             fillColor: selectionFillColorString ? selectionFillColorString : null,
             fillColor2: selectionFillColor2String ? selectionFillColor2String : null,
             fillGradientType: selectionFillGradientType,
+            fillGradientAngle: selectionFillGradientAngle,
             thickness: selectionThickness
         };
     }
@@ -632,9 +654,11 @@ const getColorsFromSelection = function (selectedItems, bitmapMode) {
         fillColor: selectionFillColorString ? selectionFillColorString : null,
         fillColor2: selectionFillColor2String ? selectionFillColor2String : null,
         fillGradientType: selectionFillGradientType,
+        fillGradientAngle: selectionFillGradientAngle,
         strokeColor: selectionStrokeColorString ? selectionStrokeColorString : null,
         strokeColor2: selectionStrokeColor2String ? selectionStrokeColor2String : null,
         strokeGradientType: selectionStrokeGradientType,
+        strokeGradientAngle: selectionStrokeGradientAngle,
         strokeWidth: selectionStrokeWidth || (selectionStrokeWidth === null) ? selectionStrokeWidth : 0
     };
 };

@@ -88,7 +88,7 @@ const makeColorStyleReducer = ({
             selectionGradientAngleKey in colors &&
             colors[selectionGradientTypeKey] === GradientTypes.LINEAR
         ) {
-            newState.angle = colors[selectionGradientAngleKey];
+            newState.gradientAngle = colors[selectionGradientAngleKey];
         }
 
         return newState;
