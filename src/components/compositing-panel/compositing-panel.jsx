@@ -5,7 +5,7 @@ import {FormattedMessage, defineMessages, injectIntl, intlShape} from 'react-int
 import bindAll from 'lodash.bindall';
 import paper from '@turbowarp/paper';
 
-import {getSelectedRootItems} from '../../helper/selection.js';
+import {getSelectedLeafItems} from '../../helper/selection.js';
 
 import PanelComponent from '../panel/panel.jsx';
 import Panels from '../../lib/panels';
@@ -25,82 +25,93 @@ const messages = defineMessages({
     normal: {
         defaultMessage: 'normal',
         description: 'Normal blend mode',
-        id: 'pm.paint.compositingPanel.blend.normal'
+        id: 'pm.paint.compositingPanel.blendMode.normal'
     },
     multiplicative: {
         defaultMessage: 'multiplicative',
         description: 'Multiplicative blend mode',
-        id: 'pm.paint.compositingPanel.blend.multiplicative'
+        id: 'pm.paint.compositingPanel.blendMode.multiplicative'
     },
     screen: {
         defaultMessage: 'screen',
         description: 'Screen blend mode',
-        id: 'pm.paint.compositingPanel.blend.screen'
+        id: 'pm.paint.compositingPanel.blendMode.screen'
     },
     overlay: {
         defaultMessage: 'overlay',
         description: 'Overlay blend mode',
-        id: 'pm.paint.compositingPanel.blend.overlay'
+        id: 'pm.paint.compositingPanel.blendMode.overlay'
     },
     softLight: {
         defaultMessage: 'soft light',
         description: 'Soft light blend mode',
-        id: 'pm.paint.compositingPanel.blend.softLight'
+        id: 'pm.paint.compositingPanel.blendMode.softLight'
     },
     hardLight: {
         defaultMessage: 'hard light',
         description: 'Hard light blend mode',
-        id: 'pm.paint.compositingPanel.blend.hardLight'
+        id: 'pm.paint.compositingPanel.blendMode.hardLight'
     },
     colorDodge: {
         defaultMessage: 'color dodge',
         description: 'Color dodge blend mode',
-        id: 'pm.paint.compositingPanel.blend.colorDodge'
+        id: 'pm.paint.compositingPanel.blendMode.colorDodge'
     },
     colorBurn: {
         defaultMessage: 'color burn',
         description: 'Color burn blend mode',
-        id: 'pm.paint.compositingPanel.blend.colorBurn'
+        id: 'pm.paint.compositingPanel.blendMode.colorBurn'
     },
     darken: {
         defaultMessage: 'darken',
         description: 'Darken blend mode',
-        id: 'pm.paint.compositingPanel.blend.darken'
+        id: 'pm.paint.compositingPanel.blendMode.darken'
     },
     lighten: {
         defaultMessage: 'lighten',
         description: 'Lighten blend mode',
-        id: 'pm.paint.compositingPanel.blend.lighten'
+        id: 'pm.paint.compositingPanel.blendMode.lighten'
     },
     difference: {
         defaultMessage: 'difference',
         description: 'Difference blend mode',
-        id: 'pm.paint.compositingPanel.blend.difference'
+        id: 'pm.paint.compositingPanel.blendMode.difference'
     },
     exclusion: {
         defaultMessage: 'exclusion',
         description: 'Exclusion blend mode',
-        id: 'pm.paint.compositingPanel.blend.exclusion'
+        id: 'pm.paint.compositingPanel.blendMode.exclusion'
     },
     hue: {
         defaultMessage: 'hue',
         description: 'Hue blend mode',
-        id: 'pm.paint.compositingPanel.blend.hue'
+        id: 'pm.paint.compositingPanel.blendMode.hue'
     },
     saturation: {
         defaultMessage: 'saturation',
         description: 'Saturation blend mode',
-        id: 'pm.paint.compositingPanel.blend.saturation'
+        id: 'pm.paint.compositingPanel.blendMode.saturation'
     },
     color: {
         defaultMessage: 'color',
         description: 'Color blend mode',
-        id: 'pm.paint.compositingPanel.blend.color'
+        id: 'pm.paint.compositingPanel.blendMode.color'
     },
     luminosity: {
         defaultMessage: 'luminosity',
         description: 'Luminosity blend mode',
-        id: 'pm.paint.compositingPanel.blend.luminosity'
+        id: 'pm.paint.compositingPanel.blendMode.luminosity'
+    },
+
+    nonzero: {
+        defaultMessage: 'non-zero',
+        description: 'Non-zero fill rule',
+        id: 'pm.paint.compositingPanel.fillRule.nonzero'
+    },
+    evenodd: {
+        defaultMessage: 'even/odd',
+        description: 'Even/odd fill rule',
+        id: 'pm.paint.compositingPanel.fillRule.evenodd'
     }
 });
 
@@ -110,7 +121,8 @@ class CompositingPanel extends React.Component {
         bindAll(this, [
             'changeOpacity',
             'onSubmitOpacity',
-            'setBlendMode'
+            'setBlendMode',
+            'setFillRule'
         ]);
 
         this.opacityBackground = this._makeOpacityBackground();
@@ -139,7 +151,7 @@ class CompositingPanel extends React.Component {
     }
 
     changeOpacity(value) {
-        getSelectedRootItems().forEach(layer => {
+        getSelectedLeafItems().forEach(layer => {
             layer.setOpacity(value / 100)
         });
 
@@ -152,18 +164,49 @@ class CompositingPanel extends React.Component {
     }
 
     setBlendMode(event) {
-        getSelectedRootItems().forEach(layer => {
+        getSelectedLeafItems().forEach(layer => {
             layer.setBlendMode(event.target.value)
         });
 
         this.props.onUpdateImage();
     }
 
+    setFillRule(event) {
+        getSelectedLeafItems().forEach(layer => {
+            layer.setFillRule(event.target.value)
+        });
+
+        this.props.onUpdateImage();
+    }
+
     render () {
-        const selectedRootItems = getSelectedRootItems();
+        const selectedLeafItems = getSelectedLeafItems();
         return (
-            <PanelComponent panel={Panels.COMPOSITING} disabled={selectedRootItems.length === 0}>
+            <PanelComponent panel={Panels.COMPOSITING} disabled={selectedLeafItems.length === 0}>
                 {paper.project && (<React.Fragment>
+                    <div className={styles.row}>
+                        <div className={styles.rowHeader}>
+                            <span className={styles.labelName}>
+                                <FormattedMessage
+                                    defaultMessage="Opacity"
+                                    description="Label for the opacity component in the compositing panel"
+                                    id="pm.paint.compositingPanel.opacity"
+                                />
+                            </span>
+                            <TWColorReadout
+                                value={selectedLeafItems[0]?.opacity * 100 || 0}
+                                onChange={this.onSubmit}
+                            />
+                        </div>
+                        <div>
+                            <Slider
+                                background={this.opacityBackground}
+                                value={selectedLeafItems[0]?.opacity * 100 || 0}
+                                onChange={this.changeOpacity}
+                                onSubmit={this.onSubmitOpacity}
+                            />
+                        </div>
+                    </div>
                     <div className={styles.row}>
                         <div className={styles.rowHeader}>
                             <span className={styles.labelName}>
@@ -177,7 +220,7 @@ class CompositingPanel extends React.Component {
                         <div>
                             <Select
                                 className={styles.select}
-                                value={selectedRootItems[0]?.blendMode}
+                                value={selectedLeafItems[0]?.blendMode}
                                 onChange={this.setBlendMode}
                                 options={[
                                     [this.props.intl.formatMessage(messages.normal), 'normal'],
@@ -204,22 +247,21 @@ class CompositingPanel extends React.Component {
                         <div className={styles.rowHeader}>
                             <span className={styles.labelName}>
                                 <FormattedMessage
-                                    defaultMessage="Opacity"
-                                    description="Label for the opacity component in the compositing panel"
-                                    id="pm.paint.compositingPanel.opacity"
+                                    defaultMessage="Fill Rule"
+                                    description="Label for the fill rule component in the compositing panel"
+                                    id="pm.paint.compositingPanel.fillRule"
                                 />
                             </span>
-                            <TWColorReadout
-                                value={selectedRootItems[0]?.opacity * 100}
-                                onChange={this.onSubmit}
-                            />
                         </div>
                         <div>
-                            <Slider
-                                background={this.opacityBackground}
-                                value={selectedRootItems[0]?.opacity * 100}
-                                onChange={this.changeOpacity}
-                                onSubmit={this.onSubmitOpacity}
+                            <Select
+                                className={styles.select}
+                                value={selectedLeafItems[0]?.fillRule}
+                                onChange={this.setFillRule}
+                                options={[
+                                    [this.props.intl.formatMessage(messages.nonzero), 'nonzero'],
+                                    [this.props.intl.formatMessage(messages.evenodd), 'evenodd'],
+                                ]}
                             />
                         </div>
                     </div>
