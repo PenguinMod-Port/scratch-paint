@@ -32,7 +32,7 @@ const ColorButtonComponent = props => (
                 [styles.outlineSwatch]: props.outline && !(props.color === MIXED)
             })}
             style={{
-                background: colorToBackground(props.color, props.color2, props.gradientType, props.gradientAngle)
+                background: colorToBackground(props.color, props.color2, props.gradientType, props.gradientAngle) + " border-box"
             }}
         >
             {props.color === null && (props.gradientType === GradientTypes.SOLID || props.color2 === null) ? (

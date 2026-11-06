@@ -14,10 +14,9 @@ import {MIXED} from '../../helper/style-path';
 import eyeDropperIcon from './icons/eye-dropper.svg';
 import noFillIcon from '../color-button/no-fill.svg';
 import mixedFillIcon from '../color-button/mixed-fill.svg';
-import fillHorzGradientIcon from '!../../tw-recolor/build!./icons/fill-horz-gradient-enabled.svg';
+import fillLinearIcon from '!../../tw-recolor/build!./icons/fill-linear-enabled.svg';
 import fillRadialIcon from '!../../tw-recolor/build!./icons/fill-radial-enabled.svg';
 import fillSolidIcon from '!../../tw-recolor/build!./icons/fill-solid-enabled.svg';
-import fillVertGradientIcon from '!../../tw-recolor/build!./icons/fill-vert-gradient-enabled.svg';
 import swapIcon from '!../../tw-recolor/build!./icons/swap.svg';
 import Modes from '../../lib/modes';
 import alphaBackground from './alpha.png';
@@ -110,7 +109,7 @@ class ColorPickerComponent extends React.Component {
                                         [styles.clickable]: true
                                     })}
                                     draggable={false}
-                                    src={fillHorzGradientIcon}
+                                    src={fillLinearIcon}
                                     onClick={this.props.onChangeGradientTypeLinear}
                                     width={20}
                                     height={20}

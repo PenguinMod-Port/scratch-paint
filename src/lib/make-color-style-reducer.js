@@ -45,7 +45,7 @@ const makeColorStyleReducer = ({
             primary: defaultColor,
             secondary: null,
             gradientType: GradientTypes.SOLID,
-            gradientAngle: 90
+            gradientAngle: 0
         };
     }
     switch (action.type) {
@@ -95,7 +95,7 @@ const makeColorStyleReducer = ({
     }
     case changeGradientTypeAction:
         if (action.gradientType in GradientTypes) {
-            return {...state, gradientType: action.gradientType, gradientAngle: action.gradientType === GradientTypes.LINEAR ? state.gradientAngle : 90};
+            return {...state, gradientType: action.gradientType, gradientAngle: action.gradientType === GradientTypes.LINEAR ? state.gradientAngle : 0};
         }
         log.warn(`Gradient type does not exist: ${action.gradientType}`);
         return state;
@@ -105,7 +105,7 @@ const makeColorStyleReducer = ({
         }
         return {...state, gradientAngle: action.gradientAngle};
     case clearGradientAction:
-        return {...state, secondary: null, gradientAngle: 90, gradientType: GradientTypes.SOLID};
+        return {...state, secondary: null, gradientAngle: 0, gradientType: GradientTypes.SOLID};
     default:
         return state;
     }
