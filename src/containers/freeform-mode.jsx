@@ -9,7 +9,7 @@ import {changeStrokeWidth} from '../reducers/stroke-width.js';
 import {changeMode} from '../reducers/modes.js';
 import {clearSelectedItems} from '../reducers/selected-items.js';
 import {MIXED} from '../helper/style-path.js';
-import {changeSimplifySize} from '../reducers/freeform-mode.js';
+import {changeSmoothingSize} from '../reducers/freeform-mode.js';
 import ColorStyleProptype from '../lib/color-style-proptype.js';
 
 import {clearSelection} from '../helper/selection.js';
@@ -41,8 +41,8 @@ class FreeformMode extends React.Component {
             this.tool.setColorState(nextProps.colorState);
         }
 
-        if (this.tool && nextProps.simplifySize !== this.props.simplifySize) {
-            this.tool.setSimplifySize(nextProps.simplifySize);
+        if (this.tool && nextProps.smoothingSize !== this.props.smoothingSize) {
+            this.tool.setSmoothingSize(nextProps.smoothingSize);
         }
 
         if (nextProps.isFreeformModeActive && !this.props.isFreeformModeActive) {
@@ -61,15 +61,15 @@ class FreeformMode extends React.Component {
         if (fillColor === MIXED || fillColor === null) {
             this.props.onChangeFillColor(FreeformMode.DEFAULT_COLOR);
         }
-        if (typeof this.props.simplifySize !== "number") {
-            this.props.onChangeSimplifySize(2);
+        if (typeof this.props.smoothingSize !== "number") {
+            this.props.onChangeSmoothingSize(2);
         }
         this.tool = new FreeformTool(
             this.props.clearSelectedItems,
             this.props.onUpdateImage
         );
         this.tool.setColorState(this.props.colorState);
-        this.tool.setSimplifySize(this.props.simplifySize);
+        this.tool.setSmoothingSize(this.props.smoothingSize);
         this.tool.activate();
     }
     deactivateTool () {
@@ -94,19 +94,19 @@ FreeformMode.propTypes = {
         strokeColor: ColorStyleProptype,
         strokeWidth: PropTypes.number
     }).isRequired,
-    simplifySize: PropTypes.number,
+    smoothingSize: PropTypes.number,
     handleMouseDown: PropTypes.func.isRequired,
     isFreeformModeActive: PropTypes.bool.isRequired,
     onChangeStrokeColor: PropTypes.func.isRequired,
     onChangeStrokeWidth: PropTypes.func.isRequired,
-    onChangeSimplifySize: PropTypes.func.isRequired,
+    onChangeSmoothingSize: PropTypes.func.isRequired,
     onUpdateImage: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
     colorState: state.scratchPaint.color,
     isFreeformModeActive: state.scratchPaint.mode === Modes.FREEFORM,
-    simplifySize: state.scratchPaint.freeformMode.simplifySize//-fillMode.simplifySize
+    smoothingSize: state.scratchPaint.freeformMode.smoothingSize//-fillMode.smoothingSize
 });
 const mapDispatchToProps = dispatch => ({
     clearSelectedItems: () => {
@@ -123,8 +123,8 @@ const mapDispatchToProps = dispatch => ({
     onChangeStrokeWidth: strokeWidth => {
         dispatch(changeStrokeWidth(strokeWidth));
     },
-    onChangeSimplifySize: simplifySize => {
-        dispatch(changeSimplifySize(simplifySize));
+    onChangeSmoothingSize: smoothingSize => {
+        dispatch(changeSmoothingSize(smoothingSize));
     }
 });
 

@@ -1,31 +1,31 @@
 import log from '../log/log';
 
-const CHANGE_FREEFORM_SIMPLIFY_SIZE = 'scratch-paint/freeform-mode/CHANGE_FREEFORM_SIMPLIFY_SIZE';
-const initialState = { simplifySize: 2 };
+const CHANGE_FREEFORM_SMOOTHING_SIZE = 'scratch-paint/freeform-mode/CHANGE_FREEFORM_SMOOTHING_SIZE';
+const initialState = { smoothingSize: 2 };
 
 const reducer = function (state, action) {
     if (typeof state === 'undefined') state = initialState;
     switch (action.type) {
-        case CHANGE_FREEFORM_SIMPLIFY_SIZE:
-            if (isNaN(action.simplifySize)) {
-                log.warn(`Invalid simplify setting: ${action.simplifySize}`);
+        case CHANGE_FREEFORM_SMOOTHING_SIZE:
+            if (isNaN(action.smoothingSize)) {
+                log.warn(`Invalid smoothing setting: ${action.smoothingSize}`);
                 return state;
             }
-            return { simplifySize: Math.max(0, action.simplifySize) };
+            return { smoothingSize: Math.max(0, action.smoothingSize) };
         default:
             return state;
     }
 };
 
 // Action creators ==================================
-const changeSimplifySize = function (simplifySize) {
+const changeSmoothingSize = function (smoothingSize) {
     return {
-        type: CHANGE_FREEFORM_SIMPLIFY_SIZE,
-        simplifySize: simplifySize
+        type: CHANGE_FREEFORM_SMOOTHING_SIZE,
+        smoothingSize: smoothingSize
     };
 };
 
 export {
     reducer as default,
-    changeSimplifySize
+    changeSmoothingSize
 };

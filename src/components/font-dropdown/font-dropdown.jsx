@@ -93,10 +93,80 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onMouseOver={props.onHoverPlayful}
+                >
+                    <DisplayFont
+                        font={Fonts.PLAYFUL}
+                        getFontName={props.getFontName}
+                    />
+                </Button>
+                <Button
+                    className={classNames(styles.modMenuItem)}
+                    onClick={props.onChoose}
+                    onMouseOver={props.onHoverBubbly}
+                >
+                    <DisplayFont
+                        font={Fonts.BUBBLY}
+                        getFontName={props.getFontName}
+                    />
+                </Button>
+                <Button
+                    className={classNames(styles.modMenuItem)}
+                    onClick={props.onChoose}
+                    onMouseOver={props.onHoverArcade}
+                >
+                    <DisplayFont
+                        font={Fonts.ARCADE}
+                        getFontName={props.getFontName}
+                    />
+                </Button>
+                <Button
+                    className={classNames(styles.modMenuItem)}
+                    onClick={props.onChoose}
+                    onMouseOver={props.onHoverBitsAndBytes}
+                >
+                    <DisplayFont
+                        font={Fonts.BITSANDBYTES}
+                        getFontName={props.getFontName}
+                    />
+                </Button>
+                <Button
+                    className={classNames(styles.modMenuItem)}
+                    onClick={props.onChoose}
+                    onMouseOver={props.onHoverTechnological}
+                >
+                    <DisplayFont
+                        font={Fonts.TECHNOLOGICAL}
+                        getFontName={props.getFontName}
+                    />
+                </Button>
+                <Button
+                    className={classNames(styles.modMenuItem)}
+                    onClick={props.onChoose}
                     onMouseOver={props.onHoverMopedLike}
                 >
                     <DisplayFont
                         font={Fonts.MOPED_LIKE}
+                        getFontName={props.getFontName}
+                    />
+                </Button>
+                <Button
+                    className={classNames(styles.modMenuItem)}
+                    onClick={props.onChoose}
+                    onMouseOver={props.onHoverArchivo}
+                >
+                    <DisplayFont
+                        font={Fonts.ARCHIVO}
+                        getFontName={props.getFontName}
+                    />
+                </Button>
+                <Button
+                    className={classNames(styles.modMenuItem)}
+                    onClick={props.onChoose}
+                    onMouseOver={props.onHoverArchivoBlack}
+                >
+                    <DisplayFont
+                        font={Fonts.ARCHIVOBLACK}
                         getFontName={props.getFontName}
                     />
                 </Button>
@@ -163,7 +233,10 @@ const ModeToolsComponent = props => (
         onOpen={props.onOpenDropdown}
         onOuterAction={props.onClickOutsideDropdown}
     >
-        <span className={styles.displayedFontName}>
+        <span
+            className={styles.displayedFontName}
+            style={props.font === "Bits and Bytes" ? { transform: "scale(0.5)", transformOrigin: "left" } : {}}
+        >
             <DisplayFont
                 font={props.font}
                 getFontName={props.getFontName}
@@ -192,6 +265,13 @@ ModeToolsComponent.propTypes = {
     onHoverMarker: PropTypes.func,
     onHoverPixel: PropTypes.func,
     onHoverMopedLike: PropTypes.func,
+    onHoverPlayful: PropTypes.func,
+    onHoverBubbly: PropTypes.func,
+    onHoverBitsAndBytes: PropTypes.func,
+    onHoverTechnological: PropTypes.func,
+    onHoverArcade: PropTypes.func,
+    onHoverArchivo: PropTypes.func,
+    onHoverArchivoBlack: PropTypes.func,
     onHoverSansSerif: PropTypes.func,
     onHoverSerif: PropTypes.func,
     onOpenDropdown: PropTypes.func
