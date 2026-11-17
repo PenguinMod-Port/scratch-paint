@@ -48,7 +48,7 @@ class TriangleTool extends paper.Tool {
         this.active = false;
 
         this.sideCount = 3;
-        this.pointCount = 1;
+        this.spokeRatio = 1;
     }
     getHitOptions() {
         return {
@@ -77,8 +77,8 @@ class TriangleTool extends paper.Tool {
         this.sideCount = sideCount;
         this.updateExistingShape();
     }
-    setPointCount(pointCount) {
-        this.pointCount = pointCount;
+    setSpokeRatio(spokeRatio) {
+        this.spokeRatio = spokeRatio;
         this.updateExistingShape();
     }
     calculateSegments() {
@@ -89,8 +89,8 @@ class TriangleTool extends paper.Tool {
             let angleIn = angle + (1 / this.sideCount) * Math.PI;
 
             segs.push(new paper.Point(Math.sin(angle) * 50, -Math.cos(angle) * 50))
-            if (this.pointCount !== 1) {
-                segs.push(new paper.Point(Math.sin(angleIn) * 50 * this.pointCount, -Math.cos(angleIn) * 50 * this.pointCount));
+            if (this.spokeRatio !== 1) {
+                segs.push(new paper.Point(Math.sin(angleIn) * 50 * this.spokeRatio, -Math.cos(angleIn) * 50 * this.spokeRatio));
             }
         }
 

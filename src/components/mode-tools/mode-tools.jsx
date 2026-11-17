@@ -474,10 +474,10 @@ const ModeToolsComponent = props => {
             }
         case Modes.TRIANGLE:
             {
-                const currentSideValue = props.trianglePolyValue;
-                const currentPointValue = props.trianglePointValue;
-                const changeFunction = props.onPolyCountSliderChange;
-                const changeFunctionPoint = props.onPointCountSliderChange;
+                const currentSideValue = props.sideCount;
+                const currentSpokeRatio = props.spokeRatio;
+                const changeFunction = props.onTriangleSideCountSliderChange;
+                const changeFunctionSpoke = props.onTriangleSpokeRatioSliderChange;
                 return (
                     <div className={classNames(props.className, styles.modeTools)}>
                         <div>
@@ -514,8 +514,8 @@ const ModeToolsComponent = props => {
                             min="0" // Spoke ratio is limited to 0.01, but setting that here makes the number input arrows work really ugly
                             step="0.1"
                             type="number"
-                            value={currentPointValue}
-                            onSubmit={changeFunctionPoint}
+                            value={currentSpokeRatio}
+                            onSubmit={changeFunctionSpoke}
                         />
                     </div>
                 );
@@ -1040,11 +1040,11 @@ const mapDispatchToProps = dispatch => ({
     onRoundedCornerSliderChange: roundedCornerSize => {
         dispatch(changeRoundedCornerSize(roundedCornerSize));
     },
-    onPolyCountSliderChange: polyCount => {
-        dispatch(changeTrianglePolyCount(polyCount));
+    onTriangleSideCountSliderChange: sideCount => {
+        dispatch(changeSideCount(sideCount));
     },
-    onPointCountSliderChange: polyCount => {
-        dispatch(changeTrianglePointCount(polyCount));
+    onTriangleSpokeRatioSliderChange: spokeRatio => {
+        dispatch(changeSpokeRatio(spokeRatio));
     },
     onCurrentlySelectedShapeChange: shape => {
         dispatch(changeCurrentlySelectedShape(shape));

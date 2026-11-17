@@ -13,7 +13,7 @@ import { changeStrokeColor, clearStrokeGradient } from '../reducers/stroke-style
 import { changeMode } from '../reducers/modes';
 import { clearSelectedItems, setSelectedItems } from '../reducers/selected-items';
 import { setCursor } from '../reducers/cursor';
-import { changeTrianglePolyCount, changeTrianglePointCount } from '../reducers/triangle-mode';
+import { changeSideCount, changeSpokeRatio } from '../reducers/triangle-mode';
 
 import { clearSelection, getSelectedLeafItems } from '../helper/selection';
 import TriangleTool from '../helper/tools/triangle-tool';
@@ -43,8 +43,8 @@ class TriangleMode extends React.Component {
         if (this.tool && nextProps.sideCount !== this.props.sideCount) {
             this.tool.setSideCount(nextProps.sideCount);
         }
-        if (this.tool && nextProps.pointCount !== this.props.pointCount) {
-            this.tool.setPointCount(nextProps.pointCount);
+        if (this.tool && nextProps.spokeRatio !== this.props.spokeRatio) {
+            this.tool.setSpokeRatio(nextProps.spokeRatio);
         }
 
         if (nextProps.isTriangleModeActive && !this.props.isTriangleModeActive) {
@@ -68,8 +68,8 @@ class TriangleMode extends React.Component {
         if (typeof this.props.sideCount !== "number") {
             this.props.onSetSideCount(3);
         }
-        if (typeof this.props.pointCount !== "number") {
-            this.props.onSetPointCount(1);
+        if (typeof this.props.spokeRatio !== "number") {
+            this.props.onSetSpokeRatio(1);
         }
 
         this.tool = new TriangleTool(
@@ -79,7 +79,7 @@ class TriangleMode extends React.Component {
             this.props.onUpdateImage
         );
         this.tool.setSideCount(this.props.sideCount);
-        this.tool.setPointCount(this.props.pointCount);
+        this.tool.setSpokeRatio(this.props.spokeRatio);
         this.tool.setColorState(this.props.colorState);
         this.tool.activate();
     }
@@ -161,17 +161,17 @@ TriangleMode.propTypes = {
     setCursor: PropTypes.func.isRequired,
     setSelectedItems: PropTypes.func.isRequired,
     sideCount: PropTypes.number.isRequired,
-    pointCount: PropTypes.number.isRequired,
+    spokeRatio: PropTypes.number.isRequired,
     onSetSideCount: PropTypes.func.isRequired,
-    onSetPointCount: PropTypes.func.isRequired,
+    onSetSpokeRatio: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
     colorState: state.scratchPaint.color,
     isTriangleModeActive: state.scratchPaint.mode === Modes.TRIANGLE,
     selectedItems: state.scratchPaint.selectedItems,
-    sideCount: state.scratchPaint.triangleMode.trianglePolyCount,
-    pointCount: state.scratchPaint.triangleMode.trianglePointCount,
+    sideCount: state.scratchPaint.triangleMode.sideCount,
+    spokeRatio: state.scratchPaint.triangleMode.spokeRatio,
 });
 const mapDispatchToProps = dispatch => ({
     clearSelectedItems: () => {
@@ -199,10 +199,10 @@ const mapDispatchToProps = dispatch => ({
         dispatch(changeStrokeColor(strokeColor));
     },
     onSetSideCount: sideCount => {
-        dispatch(changeTrianglePolyCount(sideCount));
+        dispatch(changeSideCount(sideCount));
     },
-    onSetPointCount: pointCount => {
-        dispatch(changeTrianglePointCount(pointCount));
+    onSetSpokeRatio: spokeRatio => {
+        dispatch(changeSpokeRatio(spokeRatio));
     }
 });
 
