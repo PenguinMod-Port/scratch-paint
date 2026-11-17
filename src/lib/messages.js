@@ -11,11 +11,6 @@ const messages = defineMessages({
         description: 'Label for the eraser tool',
         id: 'paint.eraserMode.eraser'
     },
-    pen: {
-        defaultMessage: 'Pen',
-        description: 'Label for the pen tool, which draws outlines',
-        id: 'paint.penMode.pen'
-    },
     fill: {
         defaultMessage: 'Fill',
         description: 'Label for the fill tool',

@@ -20,7 +20,6 @@ import formatReducer from './format';
 import hoverReducer from './hover';
 import layoutReducer from './layout';
 import modalsReducer from './modals';
-import penModeReducer from './pen-mode';
 import freeformModeReducer from './freeform-mode';
 import selectedItemReducer from './selected-items';
 import textAlignmentReducer from './text-alignment';
@@ -54,7 +53,6 @@ export default combineReducers({
     hoveredItemId: hoverReducer,
     layout: layoutReducer,
     modals: modalsReducer,
-    penMode: penModeReducer,
     freeformMode: freeformModeReducer,
     selectedItems: selectedItemReducer,
     textAlignment: textAlignmentReducer,

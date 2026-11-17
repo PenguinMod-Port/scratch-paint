@@ -6,7 +6,6 @@ import React from 'react';
 
 import {changeBrushSize, changeSmoothingSize as changeBrushSmoothingSize, setBrushShape, toggleBrushPressure} from '../../reducers/brush-mode';
 import {changeBrushSize as changeEraserSize, changeSmoothingSize as changeEraserSmoothingSize, setBrushShape as setEraserShape} from '../../reducers/eraser-mode';
-import {changeSmoothingSize as changePenSmoothingSize} from '../../reducers/pen-mode';
 import {changeRoundedCornerSize} from '../../reducers/rect-mode';
 import {changeRoundedRectCornerSize} from '../../reducers/rounded-rect-mode';
 import {changeSideCount, changeSpokeRatio} from '../../reducers/triangle-mode';
@@ -110,11 +109,6 @@ const ModeToolsComponent = props => {
             defaultMessage: 'Smoothing',
             description: 'Label for the eraser smoothing input, higher numbers control how much the drawn line will be corrected',
             id: 'pm.paint.modeTools.eraserSmoothing'
-        },
-        penSmoothing: {
-            defaultMessage: 'Smoothing',
-            description: 'Label for the pen smoothing input, higher numbers control how much the drawn line will be corrected',
-            id: 'pm.paint.modeTools.penSmoothing'
         },
         freeformSmoothing: {
             defaultMessage: 'Smoothing',
@@ -578,26 +572,6 @@ const ModeToolsComponent = props => {
                     </div>
                 );
             }
-        case Modes.PEN:
-            {
-                const currentPenSmoothingValue = props.penSmoothingValue;
-                const changeFunctionSmoothing = props.onPenSmoothingSliderChange;
-                return (
-                    <div className={classNames(props.className, styles.modeTools)}>
-                        <Label text={props.intl.formatMessage(messages.penSmoothing)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
-                            <LiveInput
-                                range
-                                small
-                                max={1000}
-                                min="0"
-                                type="number"
-                                value={currentPenSmoothingValue}
-                                onSubmit={changeFunctionSmoothing}
-                            />
-                        </Label>
-                    </div>
-                );
-            }
         case Modes.RESHAPE:
             const lineJoinReshape = (
                 <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
@@ -963,7 +937,6 @@ ModeToolsComponent.propTypes = {
     eraserValue: PropTypes.number,
     eraserSmoothingValue: PropTypes.number,
     brushType: PropTypes.string,
-    penSmoothingValue: PropTypes.number,
     roundedCornerValue: PropTypes.number,
     roundedRectCornerValue: PropTypes.number,
     trianglePolyValue: PropTypes.number,
@@ -987,7 +960,6 @@ ModeToolsComponent.propTypes = {
     onEraserSliderChange: PropTypes.func,
     onBrushChange: PropTypes.func,
     onEraserSmoothingSliderChange: PropTypes.func,
-    onPenSmoothingSliderChange: PropTypes.func,
     onFillShapes: PropTypes.func.isRequired,
     onFlipHorizontal: PropTypes.func.isRequired,
     onFlipVertical: PropTypes.func.isRequired,
@@ -1018,7 +990,6 @@ const mapStateToProps = state => ({
     eraserSize: state.scratchPaint.eraserMode.brushSize,
     eraserShape: state.scratchPaint.eraserMode.brushShape,
     eraserSmoothingSize: state.scratchPaint.eraserMode.smoothingSize,
-    penSmoothingSize: state.scratchPaint.penMode.smoothingSize,
     rectRoundedCornerSize: state.scratchPaint.rectMode.roundedCornerSize,
     roundedRectRoundedCornerSize: state.scratchPaint.roundedRectMode.roundedCornerSize,
     freeformSmoothingSize: state.scratchPaint.freeformMode.smoothingSize,
@@ -1066,9 +1037,6 @@ const mapDispatchToProps = dispatch => ({
     },
     onBrushChange: type => {
         dispatch(setBrushType(type));
-    },
-    onPenSmoothingSliderChange: eraserSize => {
-        dispatch(changePenSmoothingSize(eraserSize));
     },
     onFillShapes: () => {
         dispatch(setShapesFilled(true));

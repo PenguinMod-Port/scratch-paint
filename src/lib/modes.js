@@ -3,7 +3,6 @@ import keyMirror from 'keymirror';
 const vectorModesObj = {
     BRUSH: null,
     ERASER: null,
-    PEN: null,
     LINE: null,
     FILL: null,
     SELECT: null,
