@@ -176,6 +176,7 @@ const getActionBounds = isBitmap => {
     if (isBitmap) {
         return ART_BOARD_BOUNDS;
     }
+    // TODO: This should be an editor setting i think? this makes the nudge tool & such escape past the larger bounds in the port, which people might not like
     // i officially HATE the paper repo more than i hate the blockly repo now
     return {
         left: -Infinity,
