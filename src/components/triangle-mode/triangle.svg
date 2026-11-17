@@ -6,7 +6,7 @@
     <defs></defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
         <g id="rectangle" stroke="#575E75" stroke-width="1.5">
-            <polygon id="rectangle-icon" points="2.5,17.5 17.5,17.5 10,2.5"></polygon>
+            <polygon id="rectangle-icon" points="4,16 16,16 10,4"></polygon>
         </g>
     </g>
 </svg>
