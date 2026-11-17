@@ -26,7 +26,8 @@ const CopyPasteHOC = function (WrappedComponent) {
             bindAll(this, [
                 'handleCopy',
                 'handleCut',
-                'handlePaste'
+                'handlePaste',
+                'handleDuplicate'
             ]);
         }
         handleCopy () {
@@ -96,6 +97,14 @@ const CopyPasteHOC = function (WrappedComponent) {
             this.props.setSelectedItems(this.props.format);
             this.props.onUpdateImage();
         }
+        handleDuplicate () {
+            // im a lazy bum
+            const previousClipboardItems = this.props.clipboardItems;
+            this.props.setClipboardItems([]);
+            this.handleCopy();
+            this.handlePaste();
+            this.props.setClipboardItems(previousClipboardItems);
+        }
         render () {
             const componentProps = omit(this.props, [
                 'clearSelectedItems',
@@ -111,6 +120,7 @@ const CopyPasteHOC = function (WrappedComponent) {
                     onCopyToClipboard={this.handleCopy}
                     onCutToClipboard={this.handleCut}
                     onPasteFromClipboard={this.handlePaste}
+                    onDuplicateItems={this.handleDuplicate}
                     {...componentProps}
                 />
             );

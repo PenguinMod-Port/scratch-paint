@@ -18,7 +18,8 @@ const PADDING_PERCENT = 25; // Padding as a percent of the max of width/height o
 const BUFFER = 50; // Number of pixels of allowance around objects at the edges of the workspace
 const MIN_RATIO = .125; // Zoom in to at least 1/8 of the screen. This way you don't end up incredibly
 //                         zoomed in for tiny costumes.
-const OUTERMOST_ZOOM_LEVEL = 0.333;
+const OUTERMOST_ZOOM_LEVEL = 0.2;
+const INNERMOST_ZOOM_LEVEL = 32;
 let ART_BOARD_BOUNDS;
 let MAX_WORKSPACE_BOUNDS;
 /* eslint-enable import/no-mutable-exports */
@@ -31,14 +32,14 @@ const resizeView = (width, height) => {
     CENTER = new paper.Point(ART_BOARD_WIDTH / 2, ART_BOARD_HEIGHT / 2);
     ART_BOARD_BOUNDS = new paper.Rectangle(0, 0, ART_BOARD_WIDTH, ART_BOARD_HEIGHT);
     MAX_WORKSPACE_BOUNDS = new paper.Rectangle(
-        -ART_BOARD_WIDTH / 4,
-        -ART_BOARD_HEIGHT / 4,
-        ART_BOARD_WIDTH * 1.5,
-        ART_BOARD_HEIGHT * 1.5);
+        -ART_BOARD_WIDTH,
+        -ART_BOARD_HEIGHT,
+        ART_BOARD_WIDTH * 3,
+        ART_BOARD_HEIGHT * 3);
 };
 resizeView(480, 360);
 
-let _workspaceBounds = ART_BOARD_BOUNDS;
+let _workspaceBounds = MAX_WORKSPACE_BOUNDS;
 
 const getWorkspaceBounds = () => _workspaceBounds;
 
@@ -85,23 +86,23 @@ const setWorkspaceBounds = clipEmpty => {
         bottom += vDiff;
     }
 
-    _workspaceBounds = new paper.Rectangle(left, top, right - left, bottom - top);
+    _workspaceBounds = MAX_WORKSPACE_BOUNDS;
 };
 
 const clampViewBounds = () => {
-    const {left, right, top, bottom} = paper.project.view.bounds;
-    if (left < _workspaceBounds.left) {
-        paper.project.view.scrollBy(new paper.Point(_workspaceBounds.left - left, 0));
+    if (paper.project.view.bounds.centerY > _workspaceBounds.bottom) {
+        paper.project.view.scrollBy(new paper.Point(0, _workspaceBounds.bottom - paper.project.view.bounds.centerY));
     }
-    if (top < _workspaceBounds.top) {
-        paper.project.view.scrollBy(new paper.Point(0, _workspaceBounds.top - top));
+    if (paper.project.view.bounds.centerX > _workspaceBounds.right) {
+        paper.project.view.scrollBy(new paper.Point(_workspaceBounds.right - paper.project.view.bounds.centerX, 0));
     }
-    if (bottom > _workspaceBounds.bottom) {
-        paper.project.view.scrollBy(new paper.Point(0, _workspaceBounds.bottom - bottom));
+    if (paper.project.view.bounds.centerY < _workspaceBounds.top) {
+        paper.project.view.scrollBy(new paper.Point(0, _workspaceBounds.top - paper.project.view.bounds.centerY));
     }
-    if (right > _workspaceBounds.right) {
-        paper.project.view.scrollBy(new paper.Point(_workspaceBounds.right - right, 0));
+    if (paper.project.view.bounds.centerX < _workspaceBounds.left) {
+        paper.project.view.scrollBy(new paper.Point(_workspaceBounds.left - paper.project.view.bounds.centerX, 0));
     }
+
     setWorkspaceBounds();
 };
 
@@ -121,7 +122,7 @@ const resizeCrosshair = () => {
 const zoomOnFixedPoint = (deltaZoom, fixedPoint) => {
     const view = paper.view;
     const preZoomCenter = view.center;
-    const newZoom = Math.max(OUTERMOST_ZOOM_LEVEL, view.zoom + deltaZoom);
+    const newZoom = Math.max(Math.min(INNERMOST_ZOOM_LEVEL, view.zoom * 2 ** deltaZoom), OUTERMOST_ZOOM_LEVEL);
     const scaling = view.zoom / newZoom;
     const preZoomOffset = fixedPoint.subtract(preZoomCenter);
     const postZoomOffset = fixedPoint.subtract(preZoomOffset.multiply(scaling))

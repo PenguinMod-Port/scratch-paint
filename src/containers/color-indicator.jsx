@@ -11,6 +11,7 @@ import GradientTypes from '../lib/gradient-types';
 import ColorIndicatorComponent from '../components/color-indicator.jsx';
 import {applyColorToSelection,
     applyGradientTypeToSelection,
+    applyGradientAngleToSelection,
     applyStrokeWidthToSelection,
     generateSecondaryColor,
     swapColorsInSelection,
@@ -23,6 +24,7 @@ const makeColorIndicator = (label, isStroke) => {
             bindAll(this, [
                 'handleChangeColor',
                 'handleChangeGradientType',
+                'handleChangeGradientAngle',
                 'handleCloseColor',
                 'handleSwap'
             ]);
@@ -83,6 +85,7 @@ const makeColorIndicator = (label, isStroke) => {
             // Apply color and update redux, but do not update svg until picker closes.
             const isDifferent = applyGradientTypeToSelection(
                 gradientType,
+                this.props.gradientAngle,
                 isStroke || (formatIsBitmap && !this.props.fillBitmapShapes),
                 this.props.textEditTarget);
             this._hasChanged = this._hasChanged || isDifferent;
@@ -101,6 +104,24 @@ const makeColorIndicator = (label, isStroke) => {
                 this.props.onChangeColorIndex(1);
             }
             if (this.props.onChangeGradientType) this.props.onChangeGradientType(gradientType);
+        }
+        handleChangeGradientAngle (gradientAngle) {
+            const formatIsBitmap = isBitmap(this.props.format);
+            // Apply color and update redux, but do not update svg until picker closes.
+            const isDifferent = applyGradientAngleToSelection(
+                this.props.gradientType,
+                gradientAngle,
+                isStroke || (formatIsBitmap && !this.props.fillBitmapShapes),
+                this.props.textEditTarget);
+            this._hasChanged = this._hasChanged || isDifferent;
+            const hasSelectedItems = getSelectedLeafItems().length > 0;
+            if (hasSelectedItems) {
+                if (isDifferent) {
+                    // Recalculates the swatch colors
+                    this.props.setSelectedItems(this.props.format);
+                }
+            }
+            if (this.props.onChangeGradientAngle) this.props.onChangeGradientAngle(gradientAngle);
         }
         handleCloseColor () {
             // If the eyedropper is currently being used, don't
@@ -138,6 +159,7 @@ const makeColorIndicator = (label, isStroke) => {
                     outline={isStroke}
                     onChangeColor={this.handleChangeColor}
                     onChangeGradientType={this.handleChangeGradientType}
+                    onChangeGradientAngle={this.handleChangeGradientAngle}
                     onCloseColor={this.handleCloseColor}
                     onSwap={this.handleSwap}
                 />
@@ -154,11 +176,13 @@ const makeColorIndicator = (label, isStroke) => {
         fillBitmapShapes: PropTypes.bool.isRequired,
         format: PropTypes.oneOf(Object.keys(Formats)),
         gradientType: PropTypes.oneOf(Object.keys(GradientTypes)).isRequired,
+        gradientAngle: PropTypes.number,
         intl: intlShape,
         isEyeDropping: PropTypes.bool.isRequired,
         onChangeColorIndex: PropTypes.func.isRequired,
         onChangeColor: PropTypes.func.isRequired,
         onChangeGradientType: PropTypes.func,
+        onChangeGradientAngle: PropTypes.func,
         onChangeStrokeWidth: PropTypes.func,
         onCloseColor: PropTypes.func.isRequired,
         onUpdateImage: PropTypes.func.isRequired,

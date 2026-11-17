@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import {changeBrushSize, changeSimplifySize, setBrushType} from '../../reducers/brush-mode';
+import {changeBrushSize, changeSimplifySize, setBrushType, toggleBrushPressure} from '../../reducers/brush-mode';
 import {changeBrushSize as changeEraserSize, changeSimplifySize as changeEraserSimplifySize} from '../../reducers/eraser-mode';
 import {changeSimplifySize as changePenSimplifySize} from '../../reducers/pen-mode';
 import {changeRoundedRectCornerSize} from '../../reducers/rounded-rect-mode';
@@ -70,6 +70,7 @@ import flipHorizontalIcon from '!../../tw-recolor/build!./icons/flip-horizontal.
 import flipVerticalIcon from '!../../tw-recolor/build!./icons/flip-vertical.svg';
 import centerSelectionIcon from '!../../tw-recolor/build!./icons/centerSelection.svg';
 import straightPointIcon from '!../../tw-recolor/build!./icons/straight-point.svg';
+import pressureIcon from '!../../tw-recolor/build!./icons/pressure.svg';
 import bitOvalIcon from '../bit-oval-mode/oval.svg';
 import bitRectIcon from '../bit-rect-mode/rectangle.svg';
 import bitOvalOutlinedIcon from '../bit-oval-mode/oval-outlined.svg';
@@ -249,7 +250,17 @@ const ModeToolsComponent = props => {
             defaultMessage: 'Center Align',
             description: 'Label for the button that sets text alignment to the center',
             id: 'pm.paint.modeTools.alignCenter'
-        }
+        },
+        freeformSimplify: {
+            defaultMessage: 'Smoothing',
+            description: 'Label for the freeform smoothing input',
+            id: 'paint.modeTools.freeformSimplify'
+        },
+        pressure: {
+            defaultMessage: 'Pressure',
+            description: 'Label for the button that makes brush strokes taper with drawing speed',
+            id: 'paint.modeTools.pressure'
+        },
     });
 
     switch (props.mode) {
@@ -335,6 +346,18 @@ const ModeToolsComponent = props => {
                                 </ButtonGroup>
                             </InputGroup>
                         )}
+                        {props.mode === Modes.BRUSH ?
+                            <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
+                                <LabeledIconButton
+                                    highlighted={props.brushPressure}
+                                    hideLabel={hideLabel(props.intl.locale)}
+                                    imgSrc={pressureIcon}
+                                    title={props.intl.formatMessage(messages.pressure)}
+                                    onClick={props.onBrushPressureClick}
+                                    gray
+                                />
+                            </InputGroup> : null
+                        }
                     </div>
                 );
             }
@@ -672,8 +695,10 @@ const ModeToolsComponent = props => {
                 </div>
             );
         case Modes.BIT_SELECT:
+        case Modes.BIT_LASSO:
         /* falls through */
         case Modes.SELECT:
+        case Modes.LASSO:
             const reshapingMethods = props.format.startsWith("BITMAP") ? null : (
                 <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
                     <LabeledIconButton
@@ -898,6 +923,26 @@ const ModeToolsComponent = props => {
                     </div>
                 );
             }
+        case Modes.FREEFORM:
+            {
+                const currentFreeformSimplifyValue = props.freeformValue;
+                const changeFunctionSimplify = props.onSimplifySliderChange;
+                return (
+                    <div className={classNames(props.className, styles.modeTools)}>
+                        <Label text={props.intl.formatMessage(messages.freeformSimplify)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
+                            <LiveInput
+                                range
+                                small
+                                max={1000}
+                                min="0"
+                                type="number"
+                                value={currentFreeformSimplifyValue}
+                                onSubmit={changeFunctionSimplify}
+                            />
+                        </Label>
+                    </div>
+                );
+            }
         default:
             // Leave empty for now, if mode not supported
             return (
@@ -909,8 +954,10 @@ const ModeToolsComponent = props => {
 ModeToolsComponent.propTypes = {
     bitBrushSize: PropTypes.number,
     bitEraserSize: PropTypes.number,
+    brushPressure: PropTypes.bool,
     brushValue: PropTypes.number,
     simplifyValue: PropTypes.number,
+    freeformValue: PropTypes.number,
     className: PropTypes.string,
     clipboardItems: PropTypes.arrayOf(PropTypes.array),
     eraserValue: PropTypes.number,
@@ -930,6 +977,7 @@ ModeToolsComponent.propTypes = {
     mode: PropTypes.string.isRequired,
     onBitBrushSliderChange: PropTypes.func.isRequired,
     onBitEraserSliderChange: PropTypes.func.isRequired,
+    onBrushPressureClick: PropTypes.func.isRequired,
     onBrushSliderChange: PropTypes.func.isRequired,
     onSimplifySliderChange: PropTypes.func.isRequired,
     onCopyToClipboard: PropTypes.func.isRequired,
@@ -973,7 +1021,10 @@ const mapStateToProps = state => ({
     roundedCornerValue: state.scratchPaint.rectMode.roundedCornerSize,
     trianglePolyValue: state.scratchPaint.triangleMode.trianglePolyCount,
     trianglePointValue: state.scratchPaint.triangleMode.trianglePointCount,
-    currentlySelectedShape: state.scratchPaint.sussyMode.shape
+    currentlySelectedShape: state.scratchPaint.sussyMode.shape,
+    brushPressure: state.scratchPaint.brushMode.pressureEnabled,
+    clipboardItems: state.scratchPaint.clipboard.items,
+    freeformValue: state.scratchPaint.freeformMode.simplifySize,
 });
 const mapDispatchToProps = dispatch => ({
     onBrushSliderChange: brushSize => {
@@ -996,6 +1047,9 @@ const mapDispatchToProps = dispatch => ({
     },
     onCurrentlySelectedShapeChange: shape => {
         dispatch(changeCurrentlySelectedShape(shape));
+    },
+    onBrushPressureClick: () => {
+        dispatch(toggleBrushPressure());
     },
     onBitBrushSliderChange: bitBrushSize => {
         dispatch(changeBitBrushSize(bitBrushSize));

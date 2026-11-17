@@ -88,6 +88,9 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
                 } else if (lowercaseKey === 'v') {
                     this.changeToASelectMode();
                     this.props.onPasteFromClipboard();
+                } else if (lowercaseKey === 'd') {
+                    this.props.onDuplicateItems();
+                    event.preventDefault();
                 } else if (lowercaseKey === 'x') {
                     const selectedItems = getSelectedRootItems();
                     if (selectedItems.length > 0) {
@@ -143,6 +146,7 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
                 'mode',
                 'onCopyToClipboard',
                 'onPasteFromClipboard',
+                'onDuplicateItems',
                 'setSelectedItems',
                 'textEditing']);
             return (
@@ -161,6 +165,7 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
         mode: PropTypes.oneOf(Object.keys(Modes)).isRequired,
         onCopyToClipboard: PropTypes.func.isRequired,
         onPasteFromClipboard: PropTypes.func.isRequired,
+        onDuplicateItems: PropTypes.func.isRequired,
         onRedo: PropTypes.func.isRequired,
         onUndo: PropTypes.func.isRequired,
         onUpdateImage: PropTypes.func.isRequired,

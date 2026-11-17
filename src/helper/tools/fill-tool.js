@@ -29,6 +29,7 @@ class FillTool extends paper.Tool {
         this.fillColor = null;
         this.fillColor2 = null;
         this.gradientType = null;
+        this.gradientAngle = 90;
 
         // The path that's being hovered over.
         this.fillItem = null;
@@ -82,6 +83,9 @@ class FillTool extends paper.Tool {
     setGradientType (gradientType) {
         this.gradientType = gradientType;
     }
+    setGradientAngle (gradientAngle) {
+        this.gradientAngle = gradientAngle;
+    }
     /**
      * To be called when the hovered item changes. When the select tool hovers over a
      * new item, it compares against this to see if a hover item change event needs to
@@ -110,7 +114,7 @@ class FillTool extends paper.Tool {
         if (!hitTargetChanged) {
             // Only radial gradient needs to be updated
             if (this.gradientType === GradientTypes.RADIAL) {
-                this._setFillItemColor(this.fillColor, this.fillColor2, this.gradientType, event.point);
+                this._setFillItemColor(this.fillColor, this.fillColor2, this.gradientType, 90, event.point);
             }
             return;
         }
@@ -150,7 +154,7 @@ class FillTool extends paper.Tool {
             } else if (this.fillItem.parent instanceof paper.CompoundPath) {
                 this.fillItemOrigColor = hitItem.parent[colorProp];
             }
-            this._setFillItemColor(this.fillColor, this.fillColor2, this.gradientType, event.point);
+            this._setFillItemColor(this.fillColor, this.fillColor2, this.gradientType, this.gradientAngle, event.point);
         }
     }
     handleMouseDown (event) {
@@ -206,7 +210,7 @@ class FillTool extends paper.Tool {
     }
     // Either pass in a fully defined paper.Color as color1,
     // or pass in 2 color strings, a gradient type, and a pointer location
-    _setFillItemColor (color1, color2, gradientType, pointerLocation) {
+    _setFillItemColor (color1, color2, gradientType, gradientAngle, pointerLocation) {
         const item = this._getFillItem();
         if (!item) return;
         const colorProp = this.fillProperty === 'fill' ? 'fillColor' : 'strokeColor';
@@ -217,6 +221,7 @@ class FillTool extends paper.Tool {
                 color1,
                 color2,
                 gradientType,
+                gradientAngle,
                 item.bounds,
                 pointerLocation,
                 item.strokeWidth

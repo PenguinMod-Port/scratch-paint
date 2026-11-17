@@ -383,6 +383,34 @@ const _rectangularSelectionGroupLoop = function (group, rect, root, event, mode)
     return true;
 };
 
+const _handleLassoSelectionItems = function (item, event, path, root) {
+    if (isPathItem(item)) {
+        const intersections = item.getIntersections(path);
+        if (intersections.length > 0 || path.contains(item.firstSegment.point)) {
+            if (event.modifiers.shift && item.selected) {
+                setItemSelection(root, false);
+            } else {
+                setItemSelection(root, true);
+            }
+            return false;
+        }
+    }
+    return true;
+}
+
+const _handleLassoSelectionGroupLoop = function (group, path, root, event) {
+    for (let i = 0; i < group.children.length; i++) {
+        const child = group.children[i];
+        
+        if (isGroup(child) || isCompoundPathItem(child)) {
+            _handleLassoSelectionGroupLoop(child, path, root, event);
+        } else {
+            _handleLassoSelectionItems(child, event, path, root);
+        }
+    }
+    return true;
+}
+
 /**
  * Called after drawing a selection rectangle in a select mode. In reshape mode, this
  * selects all control points and curves within the rectangle. In select mode, this
@@ -404,6 +432,20 @@ const processRectangularSelection = function (event, rect, mode) {
             _rectangularSelectionGroupLoop(item, rect, item, event, mode);
         } else {
             _handleRectangularSelectionItems(item, event, rect, mode, item);
+        }
+    }
+};
+
+const processLassoSelection = function (event, path) {
+    const allItems = getAllSelectableRootItems();
+    
+    for (let i = 0; i < allItems.length; i++) {
+        const item = allItems[i];
+        if (isGroup(item) || isCompoundPathItem(item)) {
+            // check for item segment points inside
+            _handleLassoSelectionGroupLoop(item, path, item, event);
+        } else {
+            _handleLassoSelectionItems(item, event, path, item);
         }
     }
 };
@@ -441,5 +483,6 @@ export {
     getSelectedRootItems,
     getSelectedSegments,
     processRectangularSelection,
+    processLassoSelection,
     selectRootItem
 };

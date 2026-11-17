@@ -21,6 +21,8 @@ const makeColorStyleReducer = ({
     changeSecondaryColorAction,
     // Action name for changing the gradient type
     changeGradientTypeAction,
+    // Action name for changing the gradient angle
+    changeGradientAngleAction,
     // Action name for clearing the gradient
     clearGradientAction,
     // Initial color when not set
@@ -33,13 +35,17 @@ const makeColorStyleReducer = ({
     selectionSecondaryColorKey,
     // The name of the property read from getColorsFromSelection to get the gradient type.
     // e.g. `fillGradientType` or `strokeGradientType`.
-    selectionGradientTypeKey
+    selectionGradientTypeKey,
+    // The name of the property read from getColorsFromSelection to get the gradient angle.
+    // e.g. `fillGradientAngle` or `strokeGradientAngle`.
+    selectionGradientAngleKey
 }) => function colorReducer (state, action) {
     if (typeof state === 'undefined') {
         state = {
             primary: defaultColor,
             secondary: null,
-            gradientType: GradientTypes.SOLID
+            gradientType: GradientTypes.SOLID,
+            gradientAngle: 0
         };
     }
     switch (action.type) {
@@ -77,16 +83,29 @@ const makeColorStyleReducer = ({
         ) {
             newState.secondary = colors[selectionSecondaryColorKey];
         }
+
+        if (
+            selectionGradientAngleKey in colors &&
+            colors[selectionGradientTypeKey] === GradientTypes.LINEAR
+        ) {
+            newState.gradientAngle = colors[selectionGradientAngleKey];
+        }
+
         return newState;
     }
     case changeGradientTypeAction:
         if (action.gradientType in GradientTypes) {
-            return {...state, gradientType: action.gradientType};
+            return {...state, gradientType: action.gradientType, gradientAngle: action.gradientType === GradientTypes.LINEAR ? state.gradientAngle : 0};
         }
         log.warn(`Gradient type does not exist: ${action.gradientType}`);
         return state;
+    case changeGradientAngleAction:
+        if (state.gradientType !== GradientTypes.LINEAR) {
+            log.warn(`Tried to set gradient angle on non-linear gradient`);
+        }
+        return {...state, gradientAngle: action.gradientAngle};
     case clearGradientAction:
-        return {...state, secondary: null, gradientType: GradientTypes.SOLID};
+        return {...state, secondary: null, gradientAngle: 0, gradientType: GradientTypes.SOLID};
     default:
         return state;
     }

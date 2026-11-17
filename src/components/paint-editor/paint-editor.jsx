@@ -36,6 +36,11 @@ import TriangleMode from '../../containers/triangle-mode.jsx';
 import ArrowMode from '../../containers/arrow-mode.jsx';
 import ReshapeMode from '../../containers/reshape-mode.jsx';
 import SelectMode from '../../containers/select-mode.jsx';
+import LassoMode from '../../containers/lasso-mode.jsx';
+import BitLassoMode from '../../containers/bit-lasso-mode.jsx';
+import PanMode from '../../containers/pan-mode.jsx';
+import BitPanMode from '../../containers/bit-pan-mode.jsx';
+import FreeformMode from '../../containers/freeform-mode.jsx';
 import StrokeColorIndicatorComponent from '../../containers/stroke-color-indicator.jsx';
 import StrokeWidthIndicatorComponent from '../../containers/stroke-width-indicator.jsx';
 import TextMode from '../../containers/text-mode.jsx';
@@ -48,9 +53,17 @@ import zoomInIcon from './icons/zoom-in.svg';
 import zoomOutIcon from './icons/zoom-out.svg';
 import zoomResetIcon from './icons/zoom-reset.svg';
 import themeIcon from './icons/theme.svg';
+import fullscreenIcon from './icons/fullscreen.svg';
+import unfullscreenIcon from './icons/unfullscreen.svg';
+import compositingPanelIcon from './icons/panels/compositing.svg';
+import layersPanelIcon from './icons/panels/layers.svg';
 
 import MultiToolSelectComponent from '../multi-tool-select/multi-tool-select.jsx';
+import PanelSelectComponent from '../panel-select-base/panel-select-base.jsx';
 import Modes from '../../lib/modes';
+import CompositingPanel from '../compositing-panel/compositing-panel.jsx';
+import LayersPanel from '../layers-panel/layers-panel.jsx';
+import Panels from '../../lib/panels.js';
 
 const messages = defineMessages({
     bitmap: {
@@ -62,12 +75,25 @@ const messages = defineMessages({
         defaultMessage: 'Convert to Vector',
         description: 'Label for button that converts the paint editor to vector mode',
         id: 'paint.paintEditor.vector'
+    },
+
+    compositing: {
+        defaultMessage: 'Compositing',
+        description: 'Label for button that switches to the compositing panel',
+        id: 'pm.paint.paintEditor.compositing'
+    },
+    layers: {
+        defaultMessage: 'Layers',
+        description: 'Label for button that switches to the layers panel',
+        id: 'pm.paint.paintEditor.layers'
     }
 });
 
 const PaintEditorComponent = props => (
     <div
-        className={styles.editorContainer}
+        className={classNames(styles.editorContainer, {
+            [styles.fullscreen]: props.isFullscreen
+        })}
         dir={props.rtl ? 'rtl' : 'ltr'}
         data-paint-theme={props.theme}
     >
@@ -85,6 +111,12 @@ const PaintEditorComponent = props => (
                         onUpdateName={props.onUpdateName}
                         width={props.width}
                     />
+                    <Button
+                        className={styles.fullscreenButton}
+                        onClick={props.onToggleFullscreen}
+                    >
+                        <img src={props.isFullscreen ? unfullscreenIcon : fullscreenIcon} />
+                    </Button>
                 </div>
                 {/* Second Row */}
                 {isVector(props.format) ?
@@ -156,15 +188,20 @@ const PaintEditorComponent = props => (
                             <SelectMode
                                 onUpdateImage={props.onUpdateImage}
                             />,
+                            <LassoMode
+                                onUpdateImage={props.onUpdateImage}
+                            />,
                             <ReshapeMode
                                 onUpdateImage={props.onUpdateImage}
                             />
                         ]}
                         modes={[
                             Modes.SELECT,
+                            Modes.LASSO,
                             Modes.RESHAPE
                         ]}
                     />
+                    <PanMode />
                     <BrushMode
                         onUpdateImage={props.onUpdateImage}
                     />
@@ -181,14 +218,33 @@ const PaintEditorComponent = props => (
                         textArea={props.textArea}
                         onUpdateImage={props.onUpdateImage}
                     />
-                    <LineMode
-                        onUpdateImage={props.onUpdateImage}
+                    <MultiToolSelectComponent
+                        tools={[
+                            <LineMode
+                                onUpdateImage={props.onUpdateImage}
+                            />,
+                            <FreeformMode
+                                onUpdateImage={props.onUpdateImage}
+                            />
+                        ]}
+                        modes={[
+                            Modes.LINE,
+                            Modes.FREEFORM
+                        ]}
                     />
-                    <OvalMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <RectMode
-                        onUpdateImage={props.onUpdateImage}
+                    <MultiToolSelectComponent
+                        tools={[
+                            <RectMode
+                                onUpdateImage={props.onUpdateImage}
+                            />,
+                            <OvalMode
+                                onUpdateImage={props.onUpdateImage}
+                            />
+                        ]}
+                        modes={[
+                            Modes.RECT,
+                            Modes.OVAL
+                        ]}
                     />
                     {props.showRoundedRectMode && (
                         <RoundedRectMode
@@ -209,16 +265,28 @@ const PaintEditorComponent = props => (
 
             {props.canvas !== null && isBitmap(props.format) ? ( // eslint-disable-line no-negated-condition
                 <div className={styles.modeSelector}>
+                    <MultiToolSelectComponent
+                        tools={[
+                            <BitSelectMode
+                                onUpdateImage={props.onUpdateImage}
+                            />,
+                            <BitLassoMode
+                                onUpdateImage={props.onUpdateImage}
+                            />
+                        ]}
+                        modes={[
+                            Modes.BIT_SELECT,
+                            Modes.BIT_LASSO
+                        ]}
+                    />
+                    <BitPanMode />
                     <BitBrushMode
                         onUpdateImage={props.onUpdateImage}
                     />
-                    <BitLineMode
+                    <BitEraserMode
                         onUpdateImage={props.onUpdateImage}
                     />
-                    <BitOvalMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <BitRectMode
+                    <BitFillMode
                         onUpdateImage={props.onUpdateImage}
                     />
                     <TextMode
@@ -226,14 +294,22 @@ const PaintEditorComponent = props => (
                         textArea={props.textArea}
                         onUpdateImage={props.onUpdateImage}
                     />
-                    <BitFillMode
+                    <BitLineMode
                         onUpdateImage={props.onUpdateImage}
                     />
-                    <BitEraserMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <BitSelectMode
-                        onUpdateImage={props.onUpdateImage}
+                    <MultiToolSelectComponent
+                        tools={[
+                            <BitRectMode
+                                onUpdateImage={props.onUpdateImage}
+                            />,
+                            <BitOvalMode
+                                onUpdateImage={props.onUpdateImage}
+                            />
+                        ]}
+                        modes={[
+                            Modes.BIT_RECT,
+                            Modes.BIT_OVAL
+                        ]}
                     />
                 </div>
             ) : null}
@@ -340,6 +416,7 @@ const PaintEditorComponent = props => (
                                     src={zoomInIcon}
                                 />
                             </Button>
+                            <span style={{ paddingTop: "0.55rem" }} className={styles.buttonGroupButton}>{paper.project ? Math.round(paper.project.view.zoom * 200) : 100}%</span>
                         </ButtonGroup>
                         <ButtonGroup>
                             <Button
@@ -357,6 +434,24 @@ const PaintEditorComponent = props => (
                     </InputGroup>
                 </div>
             </div>
+            {isVector(props.format) && (<React.Fragment>
+                <CompositingPanel onUpdateImage={props.onUpdateImage} />
+                <LayersPanel onUpdateImage={props.onUpdateImage} />
+
+                <div className={styles.modeSelector}>
+                    <PanelSelectComponent
+                        imgDescriptor={messages.compositing}
+                        imgSrc={compositingPanelIcon}
+                        panel={Panels.COMPOSITING}
+                    />
+
+                    <PanelSelectComponent
+                        imgDescriptor={messages.layers}
+                        imgSrc={layersPanelIcon}
+                        panel={Panels.LAYERS}
+                    />
+                </div>
+            </React.Fragment>)}
         </div>
     </div>
 );
@@ -375,12 +470,14 @@ PaintEditorComponent.propTypes = {
     imageId: PropTypes.string,
     intl: intlShape,
     isEyeDropping: PropTypes.bool,
+    isFullscreen: PropTypes.bool,
     name: PropTypes.string,
     onChangeTheme: PropTypes.func.isRequired,
     onManageFonts: PropTypes.func,
     onRedo: PropTypes.func.isRequired,
     onSwitchToBitmap: PropTypes.func.isRequired,
     onSwitchToVector: PropTypes.func.isRequired,
+    onToggleFullscreen: PropTypes.func.isRequired,
     onUndo: PropTypes.func.isRequired,
     onUpdateImage: PropTypes.func.isRequired,
     onUpdateName: PropTypes.func.isRequired,

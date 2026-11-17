@@ -7,7 +7,7 @@ import GradientTypes from '../lib/gradient-types';
 import FillTool from '../helper/tools/fill-tool';
 import {generateSecondaryColor, MIXED} from '../helper/style-path';
 
-import {changeFillColor, changeFillColor2, DEFAULT_COLOR} from '../reducers/fill-style';
+import {changeFillColor, changeFillColor2, changeFillGradientAngle, DEFAULT_COLOR} from '../reducers/fill-style';
 import {changeMode} from '../reducers/modes';
 import {clearSelectedItems} from '../reducers/selected-items';
 import {clearSelection} from '../helper/selection';
@@ -42,6 +42,9 @@ class FillMode extends React.Component {
             }
             if (nextProps.fillModeGradientType !== this.props.fillModeGradientType) {
                 this.tool.setGradientType(nextProps.fillModeGradientType);
+            }
+            if (nextProps.fillModeGradientAngle !== this.props.fillModeGradientAngle) {
+                this.tool.setGradientAngle(nextProps.fillModeGradientAngle);
             }
         }
 
@@ -90,6 +93,7 @@ class FillMode extends React.Component {
         this.tool.setFillColor(fillColor);
         this.tool.setFillColor2(fillColor2);
         this.tool.setGradientType(gradientType);
+        this.tool.setGradientAngle(this.props.fillGradientAngle);
         this.tool.setPrevHoveredItemId(this.props.hoveredItemId);
         this.tool.activate();
     }
@@ -116,6 +120,7 @@ FillMode.propTypes = {
     fillColor2: PropTypes.string,
     fillStyleGradientType: PropTypes.oneOf(Object.keys(GradientTypes)).isRequired,
     fillModeGradientType: PropTypes.oneOf(Object.keys(GradientTypes)),
+    fillGradientAngle: PropTypes.number.isRequired,
     handleMouseDown: PropTypes.func.isRequired,
     hoveredItemId: PropTypes.number,
     isFillModeActive: PropTypes.bool.isRequired,
@@ -129,6 +134,7 @@ const mapStateToProps = state => ({
     fillColor: state.scratchPaint.color.fillColor.primary,
     fillColor2: state.scratchPaint.color.fillColor.secondary,
     fillStyleGradientType: state.scratchPaint.color.fillColor.gradientType, // Selected item(s)' gradient type
+    fillGradientAngle: state.scratchPaint.color.fillColor.gradientAngle,
     hoveredItemId: state.scratchPaint.hoveredItemId,
     isFillModeActive: state.scratchPaint.mode === Modes.FILL
 });
@@ -144,6 +150,9 @@ const mapDispatchToProps = dispatch => ({
     },
     changeGradientType: gradientType => {
         dispatch(changeGradientType(gradientType));
+    },
+    changeGradientAngle: gradientAngle => {
+        dispatch(changeFillGradientAngle(gradientAngle));
     },
     handleMouseDown: () => {
         dispatch(changeMode(Modes.FILL));

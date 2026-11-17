@@ -2,7 +2,7 @@ import {connect} from 'react-redux';
 import {defineMessages} from 'react-intl';
 
 import {changeColorIndex} from '../reducers/color-index';
-import {changeFillColor, changeFillColor2} from '../reducers/fill-style';
+import {changeFillColor, changeFillColor2, changeFillGradientAngle} from '../reducers/fill-style';
 import {changeGradientType} from '../reducers/fill-mode-gradient-type';
 import {openFillColor, closeFillColor} from '../reducers/modals';
 import {getSelectedLeafItems} from '../helper/selection';
@@ -31,6 +31,7 @@ const mapStateToProps = state => ({
     fillBitmapShapes: state.scratchPaint.fillBitmapShapes,
     format: state.scratchPaint.format,
     gradientType: state.scratchPaint.color.fillColor.gradientType,
+    gradientAngle: state.scratchPaint.color.fillColor.gradientAngle,
     isEyeDropping: state.scratchPaint.color.eyeDropper.active,
     mode: state.scratchPaint.mode,
     shouldShowGradientTools: state.scratchPaint.mode in GradientToolsModes,
@@ -56,6 +57,9 @@ const mapDispatchToProps = dispatch => ({
     },
     onChangeGradientType: gradientType => {
         dispatch(changeGradientType(gradientType));
+    },
+    onChangeGradientAngle: gradientAngle => {
+        dispatch(changeFillGradientAngle(gradientAngle));
     },
     setSelectedItems: format => {
         dispatch(setSelectedItems(getSelectedLeafItems(), isBitmap(format)));

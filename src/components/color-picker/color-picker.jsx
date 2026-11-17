@@ -14,10 +14,9 @@ import {MIXED} from '../../helper/style-path';
 import eyeDropperIcon from './icons/eye-dropper.svg';
 import noFillIcon from '../color-button/no-fill.svg';
 import mixedFillIcon from '../color-button/mixed-fill.svg';
-import fillHorzGradientIcon from '!../../tw-recolor/build!./icons/fill-horz-gradient-enabled.svg';
+import fillLinearIcon from '!../../tw-recolor/build!./icons/fill-linear-enabled.svg';
 import fillRadialIcon from '!../../tw-recolor/build!./icons/fill-radial-enabled.svg';
 import fillSolidIcon from '!../../tw-recolor/build!./icons/fill-solid-enabled.svg';
-import fillVertGradientIcon from '!../../tw-recolor/build!./icons/fill-vert-gradient-enabled.svg';
 import swapIcon from '!../../tw-recolor/build!./icons/swap.svg';
 import Modes from '../../lib/modes';
 import alphaBackground from './alpha.png';
@@ -26,6 +25,7 @@ import Input from '../forms/input.jsx';
 import {makeAlphaComponent} from '../../lib/tw-color-utils';
 import TWColorReadout from '../tw-color-readout/tw-color-readout.jsx';
 import TWRenderRecoloredImage from '../../tw-recolor/render.jsx';
+import SimpleDial from '../simple-dial/simple-dial.jsx';
 
 const BufferedInput = BufferedInputHOC(Input);
 
@@ -105,24 +105,12 @@ class ColorPickerComponent extends React.Component {
                                 />
                                 <TWRenderRecoloredImage
                                     className={classNames({
-                                        [styles.inactiveGradient]:
-                                            this.props.gradientType !== GradientTypes.HORIZONTAL,
+                                        [styles.inactiveGradient]: this.props.gradientType !== GradientTypes.LINEAR,
                                         [styles.clickable]: true
                                     })}
                                     draggable={false}
-                                    src={fillHorzGradientIcon}
-                                    onClick={this.props.onChangeGradientTypeHorizontal}
-                                    width={20}
-                                    height={20}
-                                />
-                                <TWRenderRecoloredImage
-                                    className={classNames({
-                                        [styles.inactiveGradient]: this.props.gradientType !== GradientTypes.VERTICAL,
-                                        [styles.clickable]: true
-                                    })}
-                                    draggable={false}
-                                    src={fillVertGradientIcon}
-                                    onClick={this.props.onChangeGradientTypeVertical}
+                                    src={fillLinearIcon}
+                                    onClick={this.props.onChangeGradientTypeLinear}
                                     width={20}
                                     height={20}
                                 />
@@ -209,6 +197,27 @@ class ColorPickerComponent extends React.Component {
                                         ) : null}
                                     </div>
                                 </div>
+                            </div>
+                        )}
+                        {this.props.gradientType !== GradientTypes.LINEAR ? null : (
+                            <div className={classNames(styles.row, styles.angleRow)}>
+                                <FormattedMessage
+                                    defaultMessage="Direction"
+                                    id="pm.paint.paintEditor.gradientDirection"
+                                />
+                                <BufferedInput
+                                    type="number"
+                                    className={styles.angleInput}
+                                    value={(Math.round(this.props.gradientAngle) + 180) % 360 - 180}
+                                    step={1}
+                                    min={-180}
+                                    max={180}
+                                    onSubmit={this.props.onChangeGradientAngle}
+                                />
+                                <SimpleDial
+                                    direction={this.props.gradientAngle}
+                                    onChange={this.props.onChangeGradientAngle}
+                                />
                             </div>
                         )}
                     </div>
@@ -374,16 +383,17 @@ ColorPickerComponent.propTypes = {
     color2: PropTypes.string,
     colorIndex: PropTypes.number.isRequired,
     gradientType: PropTypes.oneOf(Object.keys(GradientTypes)).isRequired,
+    gradientAngle: PropTypes.number.isRequired,
     hue: PropTypes.number.isRequired,
     intl: intlShape.isRequired,
     isEyeDropping: PropTypes.bool.isRequired,
     mode: PropTypes.oneOf(Object.keys(Modes)),
     onActivateEyeDropper: PropTypes.func.isRequired,
     onBrightnessChange: PropTypes.func.isRequired,
-    onChangeGradientTypeHorizontal: PropTypes.func.isRequired,
+    onChangeGradientTypeLinear: PropTypes.func.isRequired,
     onChangeGradientTypeRadial: PropTypes.func.isRequired,
     onChangeGradientTypeSolid: PropTypes.func.isRequired,
-    onChangeGradientTypeVertical: PropTypes.func.isRequired,
+    onChangeGradientAngle: PropTypes.func.isRequired,
     onHueChange: PropTypes.func.isRequired,
     onSaturationChange: PropTypes.func.isRequired,
     onSelectColor: PropTypes.func.isRequired,

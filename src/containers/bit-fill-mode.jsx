@@ -7,7 +7,7 @@ import GradientTypes from '../lib/gradient-types';
 
 import FillModeComponent from '../components/bit-fill-mode/bit-fill-mode.jsx';
 
-import {changeFillColor, changeFillColor2, DEFAULT_COLOR} from '../reducers/fill-style';
+import {changeFillColor, changeFillColor2, changeFillGradientAngle, DEFAULT_COLOR} from '../reducers/fill-style';
 import {changeMode} from '../reducers/modes';
 import {clearSelectedItems} from '../reducers/selected-items';
 import {changeGradientType} from '../reducers/fill-mode-gradient-type';
@@ -38,6 +38,9 @@ class BitFillMode extends React.Component {
             }
             if (nextProps.fillModeGradientType !== this.props.fillModeGradientType) {
                 this.tool.setGradientType(nextProps.fillModeGradientType);
+            }
+            if (nextProps.fillModeGradientAngle !== this.props.fillModeGradientAngle) {
+                this.tool.setGradientAngle(nextProps.fillModeGradientAngle);
             }
         }
 
@@ -82,6 +85,7 @@ class BitFillMode extends React.Component {
         this.tool.setColor(color);
         this.tool.setColor2(color2);
         this.tool.setGradientType(gradientType);
+        this.tool.setGradientAngle(this.props.fillGradientAngle);
         this.tool.activate();
     }
     deactivateTool () {
@@ -106,6 +110,7 @@ BitFillMode.propTypes = {
     color2: PropTypes.string,
     styleGradientType: PropTypes.oneOf(Object.keys(GradientTypes)).isRequired,
     fillModeGradientType: PropTypes.oneOf(Object.keys(GradientTypes)),
+    fillGradientAngle: PropTypes.number.isRequired,
     handleMouseDown: PropTypes.func.isRequired,
     isFillModeActive: PropTypes.bool.isRequired,
     onChangeFillColor: PropTypes.func.isRequired,
@@ -117,6 +122,7 @@ const mapStateToProps = state => ({
     color: state.scratchPaint.color.fillColor.primary,
     color2: state.scratchPaint.color.fillColor.secondary,
     styleGradientType: state.scratchPaint.color.fillColor.gradientType,
+    fillGradientAngle: state.scratchPaint.color.fillColor.gradientAngle,
     isFillModeActive: state.scratchPaint.mode === Modes.BIT_FILL
 });
 const mapDispatchToProps = dispatch => ({
@@ -125,6 +131,9 @@ const mapDispatchToProps = dispatch => ({
     },
     changeGradientType: gradientType => {
         dispatch(changeGradientType(gradientType));
+    },
+    changeGradientAngle: gradientAngle => {
+        dispatch(changeFillGradientAngle(gradientAngle));
     },
     handleMouseDown: () => {
         dispatch(changeMode(Modes.BIT_FILL));

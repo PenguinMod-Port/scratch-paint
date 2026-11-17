@@ -1,0 +1,29 @@
+@import "../../css/colors.css";
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+}
+
+.dial-container {
+    position: relative;
+    border: 1px solid $form-border;
+    border-radius: 100%;
+    overflow: hidden;
+    background: $input-background;
+}
+
+.gauge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: visible;
+}
+
+.gauge-path {
+    stroke: $text-primary;
+    stroke-width: 2px;
+    stroke-linecap: round;
+}

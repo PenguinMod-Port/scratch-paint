@@ -51,10 +51,9 @@ class ColorPicker extends React.Component {
         super(props);
         bindAll(this, [
             'getHsv',
-            'handleChangeGradientTypeHorizontal',
+            'handleChangeGradientTypeLinear',
             'handleChangeGradientTypeRadial',
             'handleChangeGradientTypeSolid',
-            'handleChangeGradientTypeVertical',
             'handleHueChange',
             'handleSaturationChange',
             'handleBrightnessChange',
@@ -164,17 +163,14 @@ class ColorPicker extends React.Component {
             this.props.onChangeColor
         );
     }
-    handleChangeGradientTypeHorizontal () {
-        this.props.onChangeGradientType(GradientTypes.HORIZONTAL);
+    handleChangeGradientTypeLinear () {
+        this.props.onChangeGradientType(GradientTypes.LINEAR);
     }
     handleChangeGradientTypeRadial () {
         this.props.onChangeGradientType(GradientTypes.RADIAL);
     }
     handleChangeGradientTypeSolid () {
         this.props.onChangeGradientType(GradientTypes.SOLID);
-    }
-    handleChangeGradientTypeVertical () {
-        this.props.onChangeGradientType(GradientTypes.VERTICAL);
     }
     render () {
         return (
@@ -184,6 +180,7 @@ class ColorPicker extends React.Component {
                 color2={this.props.color2}
                 colorIndex={this.props.colorIndex}
                 gradientType={this.props.gradientType}
+                gradientAngle={this.props.gradientAngle}
                 hue={this.state.hue}
                 isEyeDropping={this.props.isEyeDropping}
                 mode={this.props.mode}
@@ -196,10 +193,10 @@ class ColorPicker extends React.Component {
                 shouldShowGradientTools={this.props.shouldShowGradientTools}
                 onActivateEyeDropper={this.handleActivateEyeDropper}
                 onBrightnessChange={this.handleBrightnessChange}
-                onChangeGradientTypeHorizontal={this.handleChangeGradientTypeHorizontal}
+                onChangeGradientTypeLinear={this.handleChangeGradientTypeLinear}
                 onChangeGradientTypeRadial={this.handleChangeGradientTypeRadial}
                 onChangeGradientTypeSolid={this.handleChangeGradientTypeSolid}
-                onChangeGradientTypeVertical={this.handleChangeGradientTypeVertical}
+                onChangeGradientAngle={this.props.onChangeGradientAngle}
                 onHueChange={this.handleHueChange}
                 onSaturationChange={this.handleSaturationChange}
                 onSelectColor={this.props.onSelectColor}
@@ -216,11 +213,13 @@ ColorPicker.propTypes = {
     color2: PropTypes.string,
     colorIndex: PropTypes.number.isRequired,
     gradientType: PropTypes.oneOf(Object.keys(GradientTypes)).isRequired,
+    gradientAngle: PropTypes.number.isRequired,
     isEyeDropping: PropTypes.bool.isRequired,
     mode: PropTypes.oneOf(Object.keys(Modes)),
     onActivateEyeDropper: PropTypes.func.isRequired,
     onChangeColor: PropTypes.func.isRequired,
     onChangeGradientType: PropTypes.func,
+    onChangeGradientAngle: PropTypes.func,
     onSelectColor: PropTypes.func.isRequired,
     onSelectColor2: PropTypes.func.isRequired,
     onSwap: PropTypes.func,

@@ -2,7 +2,7 @@ import {connect} from 'react-redux';
 import {defineMessages} from 'react-intl';
 
 import {changeColorIndex} from '../reducers/color-index';
-import {changeStrokeColor, changeStrokeColor2, changeStrokeGradientType} from '../reducers/stroke-style';
+import {changeStrokeColor, changeStrokeColor2, changeStrokeGradientType, changeStrokeGradientAngle} from '../reducers/stroke-style';
 import {changeStrokeWidth} from '../reducers/stroke-width';
 import {openStrokeColor, closeStrokeColor} from '../reducers/modals';
 import {getSelectedLeafItems} from '../helper/selection';
@@ -33,6 +33,7 @@ const mapStateToProps = state => ({
     colorModalVisible: state.scratchPaint.modals.strokeColor,
     format: state.scratchPaint.format,
     gradientType: state.scratchPaint.color.strokeColor.gradientType,
+    gradientAngle: state.scratchPaint.color.strokeColor.gradientAngle,
     isEyeDropping: state.scratchPaint.color.eyeDropper.active,
     mode: state.scratchPaint.mode,
     shouldShowGradientTools: state.scratchPaint.mode in GradientToolsModes,
@@ -61,6 +62,9 @@ const mapDispatchToProps = dispatch => ({
     },
     onChangeGradientType: gradientType => {
         dispatch(changeStrokeGradientType(gradientType));
+    },
+    onChangeGradientAngle: gradientAngle => {
+        dispatch(changeStrokeGradientType(gradientAngle));
     },
     setSelectedItems: format => {
         dispatch(setSelectedItems(getSelectedLeafItems(), isBitmap(format)));

@@ -1,6 +1,6 @@
 import paper from '@turbowarp/paper';
 import {getSelectedRootItems} from '../selection';
-import {getActionBounds} from '../view';
+import {ART_BOARD_BOUNDS, getActionBounds} from '../view';
 import {BitmapModes} from '../../lib/modes';
 
 const NUDGE_MORE_MULTIPLIER = 15;
@@ -41,21 +41,40 @@ class NudgeTool {
                 rect = item.bounds;
             }
         }
-        const bounds = getActionBounds(this.boundingBoxTool.isBitmap);
-        const bottom = bounds.bottom - rect.top - 1;
-        const top = bounds.top - rect.bottom + 1;
-        const left = bounds.left - rect.right + 1;
-        const right = bounds.right - rect.left - 1;
 
         let translation;
-        if (event.key === 'up') {
-            translation = new paper.Point(0, Math.min(bottom, Math.max(-nudgeAmount, top)));
-        } else if (event.key === 'down') {
-            translation = new paper.Point(0, Math.max(top, Math.min(nudgeAmount, bottom)));
-        } else if (event.key === 'left') {
-            translation = new paper.Point(Math.min(right, Math.max(-nudgeAmount, left)), 0);
-        } else if (event.key === 'right') {
-            translation = new paper.Point(Math.max(left, Math.min(nudgeAmount, right)), 0);
+        if (event.modifiers.control) {
+            const bounds = ART_BOARD_BOUNDS;
+            const bottom = bounds.bottom - (event.modifiers.shift ? rect.top : rect.bottom);
+            const top = bounds.top - (event.modifiers.shift ? rect.bottom : rect.top);
+            const left = bounds.left - (event.modifiers.shift ? rect.right : rect.left);
+            const right = bounds.right - (event.modifiers.shift ? rect.left : rect.right);
+
+            if (event.key === 'up') {
+                translation = new paper.Point(0, top);
+            } else if (event.key === 'down') {
+                translation = new paper.Point(0, bottom);
+            } else if (event.key === 'left') {
+                translation = new paper.Point(left, 0);
+            } else if (event.key === 'right') {
+                translation = new paper.Point(right, 0);
+            }
+        } else {
+            const bounds = getActionBounds(this.boundingBoxTool.isBitmap);
+            const bottom = bounds.bottom - rect.top - 1;
+            const top = bounds.top - rect.bottom + 1;
+            const left = bounds.left - rect.right + 1;
+            const right = bounds.right - rect.left - 1;
+
+            if (event.key === 'up') {
+                translation = new paper.Point(0, Math.min(bottom, Math.max(-nudgeAmount, top)));
+            } else if (event.key === 'down') {
+                translation = new paper.Point(0, Math.max(top, Math.min(nudgeAmount, bottom)));
+            } else if (event.key === 'left') {
+                translation = new paper.Point(Math.min(right, Math.max(-nudgeAmount, left)), 0);
+            } else if (event.key === 'right') {
+                translation = new paper.Point(Math.max(left, Math.min(nudgeAmount, right)), 0);
+            }
         }
 
         if (translation) {

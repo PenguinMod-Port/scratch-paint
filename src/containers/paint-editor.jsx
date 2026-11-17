@@ -19,6 +19,7 @@ import {updateViewBounds} from '../reducers/view-bounds';
 import {setLayout} from '../reducers/layout';
 import {setTheme as setReduxTheme} from '../reducers/theme';
 import {setCustomFonts} from '../reducers/custom-fonts';
+import {setSettingsStore} from '../reducers/editor-settings-store';
 
 import {getSelectedLeafItems} from '../helper/selection';
 import {convertToBitmap, convertToVector} from '../helper/bitmap';
@@ -90,14 +91,17 @@ class PaintEditor extends React.Component {
             'handleChangeTheme',
             'handleZoomIn',
             'handleZoomOut',
-            'handleZoomReset'
+            'handleZoomReset',
+            'handleToggleFullscreen'
         ]);
         this.state = {
             canvas: null,
-            colorInfo: null
+            colorInfo: null,
+            fullscreen: false
         };
         this.props.setLayout(this.props.rtl ? 'rtl' : 'ltr');
         this.props.onCustomFontsChanged(this.props.customFonts);
+        if (this.props.settingsStore) this.props.onSettingsStoreChanged(this.props.settingsStore);
         resizeView(this.props.width, this.props.height);
     }
     componentDidMount () {
@@ -183,8 +187,14 @@ class PaintEditor extends React.Component {
             case Modes.BIT_SELECT:
                 this.props.changeMode(Modes.SELECT);
                 break;
+            case Modes.BIT_LASSO:
+                this.props.changeMode(Modes.LASSO);
+                break;
+            case Modes.BIT_PAN:
+                this.props.changeMode(Modes.PAN);
+                break;
             default:
-                log.error(`Mode not handled: ${this.props.mode}`);
+                log.warn(`Mode not handled: ${this.props.mode}`);
                 this.props.changeMode(Modes.BRUSH);
             }
         } else if (isBitmap(newFormat)) {
@@ -220,6 +230,12 @@ class PaintEditor extends React.Component {
                 /* falls through */
             case Modes.SELECT:
                 this.props.changeMode(Modes.BIT_SELECT);
+                break;
+            case Modes.LASSO:
+                this.props.changeMode(Modes.BIT_LASSO);
+                break;
+            case Modes.PAN:
+                this.props.changeMode(Modes.BIT_PAN);
                 break;
             default:
                 log.error(`Mode not handled: ${this.props.mode}`);
@@ -257,6 +273,20 @@ class PaintEditor extends React.Component {
     }
     handleSetSelectedItems () {
         this.props.setSelectedItems(this.props.format);
+    }
+    async handleToggleFullscreen(event) {
+        try {
+            if (event instanceof Event || document.fullscreenElement) {
+                if (document.fullscreenElement) await document.exitFullscreen();
+                document.removeEventListener('fullscreenchange', this.handleToggleFullscreen);
+                this.setState({fullscreen: false});
+            } else {
+                await document.body.requestFullscreen();
+                this.setState({fullscreen: true});
+                requestAnimationFrame(_ => document.addEventListener('fullscreenchange', this.handleToggleFullscreen));
+            }
+            queueMicrotask(() => window.dispatchEvent(new Event('resize')));
+        } catch (e) {}
     }
     setCanvas (canvas) {
         this.setState({canvas: canvas});
@@ -343,6 +373,7 @@ class PaintEditor extends React.Component {
                 imageFormat={this.props.imageFormat}
                 imageId={this.props.imageId}
                 isEyeDropping={this.props.isEyeDropping}
+                isFullscreen={this.state.fullscreen}
                 name={this.props.name}
                 rotationCenterX={this.props.rotationCenterX}
                 rotationCenterY={this.props.rotationCenterY}
@@ -359,6 +390,7 @@ class PaintEditor extends React.Component {
                 onRedo={this.props.onRedo}
                 onSwitchToBitmap={this.props.handleSwitchToBitmap}
                 onSwitchToVector={this.props.handleSwitchToVector}
+                onToggleFullscreen={this.handleToggleFullscreen}
                 onUndo={this.props.onUndo}
                 onUpdateImage={this.props.onUpdateImage}
                 onUpdateName={this.props.onUpdateName}
@@ -418,7 +450,10 @@ PaintEditor.propTypes = {
     height: PropTypes.number,
     updateViewBounds: PropTypes.func.isRequired,
     viewBounds: PropTypes.instanceOf(paper.Matrix).isRequired,
-    zoomLevelId: PropTypes.string
+    zoomLevelId: PropTypes.string,
+
+    onSettingsStoreChanged: PropTypes.func.isRequired,
+    settingsStore: PropTypes.object
 };
 
 PaintEditor.defaultProps = {
@@ -471,6 +506,10 @@ const mapDispatchToProps = dispatch => ({
     },
     updateViewBounds: matrix => {
         dispatch(updateViewBounds(matrix));
+    },
+
+    onSettingsStoreChanged: store => {
+        dispatch(setSettingsStore(store));
     }
 });
 

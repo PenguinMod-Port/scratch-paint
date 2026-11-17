@@ -1,5 +1,6 @@
 @import "../../css/colors.css";
 @import "../../css/units.css";
+@import "../../css/filters.css";
 
 .multiTool {
     width: 40px;
@@ -20,9 +21,27 @@
     margin-left: calc((40px + 2 * $grid-unit) * var(--index) * -1);
 }
 
-.multiTool:hover .tools {
+.multiTool.selected:hover .tools {
     width: auto;
     --index: 0;
-    background-color: $ui-pane-gray;
+    background-color: $ui-pane-border;
     border-radius: .25rem;
+}
+
+.arrow {
+    width: 6px;
+    position: absolute;
+    z-index: 255;
+    top: 2px;
+    right: 2px;
+    filter: $filter-icon-gray;
+    pointer-events: none;
+}
+
+.selected .arrow {
+    filter: brightness(0) invert(1);
+}
+
+.multiTool.selected:hover .arrow {
+    display: none;
 }

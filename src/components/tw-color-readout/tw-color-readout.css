@@ -5,6 +5,7 @@
   -moz-appearance: textfield;
   font: inherit;
   font-weight: bold;
+  box-sizing: content-box;
 }
 [dir="ltr"] .readout {
   margin-left: 10px;

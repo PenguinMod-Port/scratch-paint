@@ -133,7 +133,8 @@ class ScrollableCanvas extends React.Component {
     handleWheel (event) {
         // Multiplier variable, so that non-pixel-deltaModes are supported. Needed for Firefox.
         // See #529 (or LLK/scratch-blocks#1190).
-        const multiplier = event.deltaMode === 0x1 ? 15 : 1;
+        let multiplier = event.deltaMode === 0x1 ? 15 : 1;
+        if (this.props.settingsStore) multiplier *= this.props.settingsStore.store.paintScrollZoom / 100;
         const deltaX = event.deltaX * multiplier;
         const deltaY = event.deltaY * multiplier;
         const canvasRect = this.props.canvas.getBoundingClientRect();
@@ -177,8 +178,8 @@ class ScrollableCanvas extends React.Component {
             heightPercent = Math.min(100, 100 * height / bounds.height);
             const centerX = (x + (width / 2) - bounds.x) / bounds.width;
             const centerY = (y + (height / 2) - bounds.y) / bounds.height;
-            topPercent = Math.max(0, (100 * centerY) - (heightPercent / 2));
-            leftPercent = Math.max(0, (100 * centerX) - (widthPercent / 2));
+            topPercent = Math.min(Math.max(0, (100 * centerY) - (heightPercent / 2)), 100 - heightPercent);
+            leftPercent = Math.min(Math.max(0, (100 * centerX) - (widthPercent / 2)), 100 - widthPercent);
         }
         return (
             <ScrollableCanvasComponent
@@ -203,11 +204,13 @@ ScrollableCanvas.propTypes = {
     hideScrollbars: PropTypes.bool,
     redrawSelectionBox: PropTypes.func.isRequired,
     style: PropTypes.string,
-    updateViewBounds: PropTypes.func.isRequired
+    updateViewBounds: PropTypes.func.isRequired,
+    settingsStore: PropTypes.object
 };
 
 const mapStateToProps = state => ({
-    viewBounds: state.scratchPaint.viewBounds
+    viewBounds: state.scratchPaint.viewBounds,
+    settingsStore: state.scratchPaint.settingsStore
 });
 const mapDispatchToProps = dispatch => ({
     redrawSelectionBox: () => {

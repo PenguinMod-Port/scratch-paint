@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@turbowarp/nanolog": "^0.2.0",
-    "@turbowarp/paper": "^0.13.0",
+    "@turbowarp/paper": "github:PenguinMod-Port/paper.js#develop-builds",
     "classnames": "2.2.5",
     "keymirror": "0.1.1",
     "lodash.bindall": "4.4.0",
@@ -76,7 +76,7 @@
     "postcss-loader": "3.0.0",
     "postcss-simple-vars": "5.0.2",
     "raf": "3.4.1",
-    "react": "16.2.0",
+    "react": "^16.3.0",
     "react-dom": "16.4.0",
     "react-intl": "2.9.0",
     "react-intl-redux": "2.0.0",
