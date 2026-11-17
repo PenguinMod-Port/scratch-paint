@@ -89,7 +89,17 @@ const ModeToolsComponent = props => {
         brushSmoothing: {
             defaultMessage: 'Smoothing',
             description: 'Label for the brush smoothing input, higher numbers control how much the drawn line will be corrected',
-            id: 'paint.modeTools.brushSmoothing'
+            id: 'pm.paint.modeTools.brushSmoothing'
+        },
+        brushCircle: {
+            defaultMessage: 'Circle Brush',
+            description: 'Label for the circle brush shape',
+            id: 'pm.paint.modeTools.brushCircle'
+        },
+        brushSquare: {
+            defaultMessage: 'Square Brush',
+            description: 'Label for the square brush shape',
+            id: 'pm.paint.modeTools.brushSquare'
         },
         eraserSize: {
             defaultMessage: 'Eraser size',
@@ -99,37 +109,32 @@ const ModeToolsComponent = props => {
         eraserSmoothing: {
             defaultMessage: 'Smoothing',
             description: 'Label for the eraser smoothing input, higher numbers control how much the drawn line will be corrected',
-            id: 'paint.modeTools.eraserSmoothing'
+            id: 'pm.paint.modeTools.eraserSmoothing'
         },
-        brushCircle: {
-            defaultMessage: 'Circle Brush',
-            description: 'Label for the circle brush shape',
-            id: 'paint.modeTools.circleSquare'
+        penSmoothing: {
+            defaultMessage: 'Smoothing',
+            description: 'Label for the pen smoothing input, higher numbers control how much the drawn line will be corrected',
+            id: 'pm.paint.modeTools.penSmoothing'
         },
-        brushSquare: {
-            defaultMessage: 'Square Brush',
-            description: 'Label for the square brush shape',
-            id: 'paint.modeTools.brushSquare'
+        freeformSmoothing: {
+            defaultMessage: 'Smoothing',
+            description: 'Label for the freeform smoothing input',
+            id: 'pm.paint.modeTools.freeformSmoothing'
         },
         roundedCornerSize: {
             defaultMessage: 'Rounded corner size',
             description: 'Label for the Rounded corner size input',
-            id: 'paint.modeTools.roundedCornerSize'
+            id: 'pm.paint.modeTools.roundedCornerSize'
         },
-        currentSideCount: {
+        sideCount: {
             defaultMessage: 'Polygon side count',
             description: 'Label for the Polygon side count input',
-            id: 'paint.modeTools.currentSideCount'
+            id: 'pm.paint.modeTools.sideCount'
         },
         spokeRatio: {
             defaultMessage: 'Star spoke ratio',
             description: 'Label for the Star spoke ratio input, controls the size of the spokes on a star',
             id: 'paint.modeTools.spokeRatio'
-        },
-        penSmoothing: {
-            defaultMessage: 'Smoothing',
-            description: 'Label for the pen smoothing input, higher numbers control how much the drawn line will be corrected',
-            id: 'paint.modeTools.penSmoothing'
         },
         copy: {
             defaultMessage: 'Copy',
@@ -186,10 +191,10 @@ const ModeToolsComponent = props => {
             description: 'Label for the button that sets the bitmap rectangle/oval mode to draw filled-in shapes',
             id: 'paint.modeTools.outlined'
         },
-        movementCenter: {
+        center: {
             defaultMessage: 'Center',
             description: 'Label for the button that moves the selected objects to the center of the canvas',
-            id: 'paint.modeTools.movementCenter'
+            id: 'pm.paint.modeTools.center'
         },
         joinSpiked: {
             defaultMessage: 'Spiked',
@@ -251,15 +256,10 @@ const ModeToolsComponent = props => {
             description: 'Label for the button that sets text alignment to the center',
             id: 'pm.paint.modeTools.alignCenter'
         },
-        freeformSimplify: {
-            defaultMessage: 'Smoothing',
-            description: 'Label for the freeform smoothing input',
-            id: 'paint.modeTools.freeformSimplify'
-        },
         pressure: {
             defaultMessage: 'Pressure',
             description: 'Label for the button that makes brush strokes taper with drawing speed',
-            id: 'paint.modeTools.pressure'
+            id: 'pm.paint.modeTools.pressure'
         },
     });
 
@@ -300,7 +300,7 @@ const ModeToolsComponent = props => {
                         />
                         
                         {hasSimplifyOption && (
-                            <Label text={props.intl.formatMessage(messages.brushSimplify)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
+                            <Label text={props.intl.formatMessage(messages.brushSmoothing)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
                                 <LiveInput
                                     range
                                     small
@@ -393,7 +393,7 @@ const ModeToolsComponent = props => {
                         />
 
                         {hasSimplifyOption && (
-                            <Label text={props.intl.formatMessage(messages.eraserSimplify)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
+                            <Label text={props.intl.formatMessage(messages.eraserSmoothing)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
                                 <LiveInput
                                     range
                                     small
@@ -482,8 +482,8 @@ const ModeToolsComponent = props => {
                     <div className={classNames(props.className, styles.modeTools)}>
                         <div>
                             <img
-                                alt={props.intl.formatMessage(messages.currentSideCount)}
-                                title={props.intl.formatMessage(messages.currentSideCount)}
+                                alt={props.intl.formatMessage(messages.sideCount)}
+                                title={props.intl.formatMessage(messages.sideCount)}
                                 className={styles.modeToolsIcon}
                                 draggable={false}
                                 src={triangleIcon}
@@ -584,7 +584,7 @@ const ModeToolsComponent = props => {
                 const changeFunctionSimplify = props.onPenSimplifySliderChange;
                 return (
                     <div className={classNames(props.className, styles.modeTools)}>
-                        <Label text={props.intl.formatMessage(messages.eraserSimplify)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
+                        <Label text={props.intl.formatMessage(messages.penSmoothing)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
                             <LiveInput
                                 range
                                 small
@@ -748,7 +748,7 @@ const ModeToolsComponent = props => {
                     <LabeledIconButton
                         hideLabel={props.intl.locale !== 'en'}
                         imgSrc={centerSelectionIcon}
-                        title={props.intl.formatMessage(messages.movementCenter)}
+                        title={props.intl.formatMessage(messages.center)}
                         onClick={props.onCenterSelection}
                     />
                 </InputGroup>
@@ -929,7 +929,7 @@ const ModeToolsComponent = props => {
                 const changeFunctionSimplify = props.onSimplifySliderChange;
                 return (
                     <div className={classNames(props.className, styles.modeTools)}>
-                        <Label text={props.intl.formatMessage(messages.freeformSimplify)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
+                        <Label text={props.intl.formatMessage(messages.freeformSmoothing)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
                             <LiveInput
                                 range
                                 small
