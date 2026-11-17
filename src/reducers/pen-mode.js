@@ -9,7 +9,7 @@ const reducer = function (state, action) {
     switch (action.type) {
         case CHANGE_PEN_SMOOTHING_SIZE:
             if (isNaN(action.smoothingSize)) {
-                log.warn(`Invalid simplify setting: ${action.smoothingSize}`);
+                log.warn(`Invalid smoothing setting: ${action.smoothingSize}`);
                 return state;
             }
             return { smoothingSize: Math.max(0, action.smoothingSize) };

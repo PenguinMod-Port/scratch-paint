@@ -4,12 +4,12 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import {changeBrushSize, changeSimplifySize, setBrushType, toggleBrushPressure} from '../../reducers/brush-mode';
-import {changeBrushSize as changeEraserSize, changeSimplifySize as changeEraserSimplifySize} from '../../reducers/eraser-mode';
-import {changeSimplifySize as changePenSimplifySize} from '../../reducers/pen-mode';
-import {changeRoundedRectCornerSize} from '../../reducers/rounded-rect-mode';
+import {changeBrushSize, changeSmoothingSize as changeBrushSmoothingSize, setBrushShape, toggleBrushPressure} from '../../reducers/brush-mode';
+import {changeBrushSize as changeEraserSize, changeSmoothingSize as changeEraserSmoothingSize, setBrushShape as setEraserShape} from '../../reducers/eraser-mode';
+import {changeSmoothingSize as changePenSmoothingSize} from '../../reducers/pen-mode';
 import {changeRoundedCornerSize} from '../../reducers/rect-mode';
-import {changeTrianglePolyCount, changeTrianglePointCount} from '../../reducers/triangle-mode';
+import {changeRoundedRectCornerSize} from '../../reducers/rounded-rect-mode';
+import {changeSideCount, changeSpokeRatio} from '../../reducers/triangle-mode';
 import {changeCurrentlySelectedShape} from '../../reducers/shape-mode';
 import {changeBitBrushSize} from '../../reducers/bit-brush-size';
 import {changeBitEraserSize} from '../../reducers/bit-eraser-size';
@@ -65,7 +65,7 @@ import curvedPointIcon from '!../../tw-recolor/build!./icons/curved-point.svg';
 import eraserIcon from '../eraser-mode/eraser.svg';
 import roundedRectIcon from '../rounded-rect-mode/rounded-rectangle.svg';
 import triangleIcon from '../triangle-mode/triangle.svg';
-import triangleSpikeRatioIcon from './icons/triangle-spike-ratio.svg';
+import triangleSpokeRatioIcon from './icons/triangle-spoke-ratio.svg';
 import flipHorizontalIcon from '!../../tw-recolor/build!./icons/flip-horizontal.svg';
 import flipVerticalIcon from '!../../tw-recolor/build!./icons/flip-vertical.svg';
 import centerSelectionIcon from '!../../tw-recolor/build!./icons/centerSelection.svg';
@@ -273,11 +273,11 @@ const ModeToolsComponent = props => {
                 const currentIcon = isVector(props.format) ? brushIcon :
                     props.mode === Modes.BIT_LINE ? bitLineIcon : bitBrushIcon;
                 const currentBrushValue = isBitmap(props.format) ? props.bitBrushSize : props.brushValue;
-                const currentSimplifyValue = props.simplifyValue;
+                const currentSmoothingValue = props.smoothingValue;
                 const changeFunction = isBitmap(props.format) ? props.onBitBrushSliderChange : props.onBrushSliderChange;
-                const changeFunctionSimplify = props.onSimplifySliderChange;
+                const changeFunctionSmoothing = props.onSmoothingSliderChange;
                 const currentMessage = props.mode === Modes.BIT_LINE ? messages.thickness : messages.brushSize;
-                const hasSimplifyOption = props.mode === Modes.BRUSH;
+                const hasSmoothingOption = props.mode === Modes.BRUSH;
                 return (
                     <div className={classNames(props.className, styles.modeTools)}>
                         <div>
@@ -299,7 +299,7 @@ const ModeToolsComponent = props => {
                             onSubmit={changeFunction}
                         />
                         
-                        {hasSimplifyOption && (
+                        {hasSmoothingOption && (
                             <Label text={props.intl.formatMessage(messages.brushSmoothing)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
                                 <LiveInput
                                     range
@@ -307,14 +307,14 @@ const ModeToolsComponent = props => {
                                     max={1000}
                                     min="0"
                                     type="number"
-                                    value={currentSimplifyValue}
-                                    onSubmit={changeFunctionSimplify}
+                                    value={currentSmoothingValue}
+                                    onSubmit={changeFunctionSmoothing}
                                 />
                             </Label>
                         )}
 
                         {/* TODO replace this with a dropdown when we add more brush shapes */}
-                        {hasSimplifyOption && (
+                        {hasSmoothingOption && (
                             <InputGroup>
                                 <ButtonGroup>
                                     <Button
@@ -367,10 +367,10 @@ const ModeToolsComponent = props => {
             {
                 const currentIcon = isVector(props.format) ? eraserIcon : bitEraserIcon;
                 const currentEraserValue = isBitmap(props.format) ? props.bitEraserSize : props.eraserValue;
-                const currentEraserSimplifyValue = props.eraserSimplifyValue;
+                const currentEraserSmoothingValue = props.eraserSmoothingValue;
                 const changeFunction = isBitmap(props.format) ? props.onBitEraserSliderChange : props.onEraserSliderChange;
-                const changeFunctionSimplify = props.onEraserSimplifySliderChange;
-                const hasSimplifyOption = props.mode === Modes.ERASER;
+                const changeFunctionSmoothing = props.onEraserSmoothingSliderChange;
+                const hasSmoothingOption = props.mode === Modes.ERASER;
                 return (
                     <div className={classNames(props.className, styles.modeTools)}>
                         <div>
@@ -392,7 +392,7 @@ const ModeToolsComponent = props => {
                             onSubmit={changeFunction}
                         />
 
-                        {hasSimplifyOption && (
+                        {hasSmoothingOption && (
                             <Label text={props.intl.formatMessage(messages.eraserSmoothing)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
                                 <LiveInput
                                     range
@@ -400,14 +400,14 @@ const ModeToolsComponent = props => {
                                     max={1000}
                                     min="0"
                                     type="number"
-                                    value={currentEraserSimplifyValue}
-                                    onSubmit={changeFunctionSimplify}
+                                    value={currentEraserSmoothingValue}
+                                    onSubmit={changeFunctionSmoothing}
                                 />
                             </Label>
                         )}
 
                         {/* TODO replace this with a dropdown when we add more brush shapes */}
-                        {hasSimplifyOption && (
+                        {hasSmoothingOption && (
                             <InputGroup>
                                 <ButtonGroup>
                                     <Button
@@ -504,14 +504,14 @@ const ModeToolsComponent = props => {
                                 title={props.intl.formatMessage(messages.spokeRatio)}
                                 className={styles.modeToolsIcon}
                                 draggable={false}
-                                src={triangleSpikeRatioIcon}
+                                src={triangleSpokeRatioIcon}
                             />
                         </div>
                         <LiveInput
                             range
                             small
                             max={1000}
-                            min="0" // Spike ratio is limited to 0.01, but setting that here makes the number input arrows work really ugly
+                            min="0" // Spoke ratio is limited to 0.01, but setting that here makes the number input arrows work really ugly
                             step="0.1"
                             type="number"
                             value={currentPointValue}
@@ -580,8 +580,8 @@ const ModeToolsComponent = props => {
             }
         case Modes.PEN:
             {
-                const currentPenSimplifyValue = props.penSimplifyValue;
-                const changeFunctionSimplify = props.onPenSimplifySliderChange;
+                const currentPenSmoothingValue = props.penSmoothingValue;
+                const changeFunctionSmoothing = props.onPenSmoothingSliderChange;
                 return (
                     <div className={classNames(props.className, styles.modeTools)}>
                         <Label text={props.intl.formatMessage(messages.penSmoothing)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
@@ -591,8 +591,8 @@ const ModeToolsComponent = props => {
                                 max={1000}
                                 min="0"
                                 type="number"
-                                value={currentPenSimplifyValue}
-                                onSubmit={changeFunctionSimplify}
+                                value={currentPenSmoothingValue}
+                                onSubmit={changeFunctionSmoothing}
                             />
                         </Label>
                     </div>
@@ -925,8 +925,8 @@ const ModeToolsComponent = props => {
             }
         case Modes.FREEFORM:
             {
-                const currentFreeformSimplifyValue = props.freeformValue;
-                const changeFunctionSimplify = props.onSimplifySliderChange;
+                const currentFreeformSmoothingValue = props.freeformValue;
+                const changeFunctionSmoothing = props.onSmoothingSliderChange;
                 return (
                     <div className={classNames(props.className, styles.modeTools)}>
                         <Label text={props.intl.formatMessage(messages.freeformSmoothing)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
@@ -936,8 +936,8 @@ const ModeToolsComponent = props => {
                                 max={1000}
                                 min="0"
                                 type="number"
-                                value={currentFreeformSimplifyValue}
-                                onSubmit={changeFunctionSimplify}
+                                value={currentFreeformSmoothingValue}
+                                onSubmit={changeFunctionSmoothing}
                             />
                         </Label>
                     </div>
@@ -956,14 +956,14 @@ ModeToolsComponent.propTypes = {
     bitEraserSize: PropTypes.number,
     brushPressure: PropTypes.bool,
     brushValue: PropTypes.number,
-    simplifyValue: PropTypes.number,
+    smoothingValue: PropTypes.number,
     freeformValue: PropTypes.number,
     className: PropTypes.string,
     clipboardItems: PropTypes.arrayOf(PropTypes.array),
     eraserValue: PropTypes.number,
-    eraserSimplifyValue: PropTypes.number,
+    eraserSmoothingValue: PropTypes.number,
     brushType: PropTypes.string,
-    penSimplifyValue: PropTypes.number,
+    penSmoothingValue: PropTypes.number,
     roundedCornerValue: PropTypes.number,
     roundedRectCornerValue: PropTypes.number,
     trianglePolyValue: PropTypes.number,
@@ -979,15 +979,15 @@ ModeToolsComponent.propTypes = {
     onBitEraserSliderChange: PropTypes.func.isRequired,
     onBrushPressureClick: PropTypes.func.isRequired,
     onBrushSliderChange: PropTypes.func.isRequired,
-    onSimplifySliderChange: PropTypes.func.isRequired,
+    onSmoothingSliderChange: PropTypes.func.isRequired,
     onCopyToClipboard: PropTypes.func.isRequired,
     onCutToClipboard: PropTypes.func.isRequired,
     onCurvePoints: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
     onEraserSliderChange: PropTypes.func,
     onBrushChange: PropTypes.func,
-    onEraserSimplifySliderChange: PropTypes.func,
-    onPenSimplifySliderChange: PropTypes.func,
+    onEraserSmoothingSliderChange: PropTypes.func,
+    onPenSmoothingSliderChange: PropTypes.func,
     onFillShapes: PropTypes.func.isRequired,
     onFlipHorizontal: PropTypes.func.isRequired,
     onFlipVertical: PropTypes.func.isRequired,
@@ -1010,28 +1010,29 @@ const mapStateToProps = state => ({
     fillBitmapShapes: state.scratchPaint.fillBitmapShapes,
     bitBrushSize: state.scratchPaint.bitBrushSize,
     bitEraserSize: state.scratchPaint.bitEraserSize,
-    brushValue: state.scratchPaint.brushMode.brushSize,
-    simplifyValue: state.scratchPaint.brushMode.simplifySize,
-    clipboardItems: state.scratchPaint.clipboard.items,
-    eraserValue: state.scratchPaint.eraserMode.brushSize,
-    eraserSimplifyValue: state.scratchPaint.eraserMode.simplifySize,
-    brushType: state.scratchPaint.brushType,
-    penSimplifyValue: state.scratchPaint.penMode.simplifySize,
-    roundedRectCornerValue: state.scratchPaint.roundedRectMode.roundedCornerSize,
-    roundedCornerValue: state.scratchPaint.rectMode.roundedCornerSize,
-    trianglePolyValue: state.scratchPaint.triangleMode.trianglePolyCount,
-    trianglePointValue: state.scratchPaint.triangleMode.trianglePointCount,
-    currentlySelectedShape: state.scratchPaint.shapeMode.shape,
+    brushSize: state.scratchPaint.brushMode.brushSize,
+    brushShape: state.scratchPaint.brushMode.brushShape,
     brushPressure: state.scratchPaint.brushMode.pressureEnabled,
+    brushSmoothingSize: state.scratchPaint.brushMode.smoothingSize,
     clipboardItems: state.scratchPaint.clipboard.items,
-    freeformValue: state.scratchPaint.freeformMode.simplifySize,
+    eraserSize: state.scratchPaint.eraserMode.brushSize,
+    eraserShape: state.scratchPaint.eraserMode.brushShape,
+    eraserSmoothingSize: state.scratchPaint.eraserMode.smoothingSize,
+    penSmoothingSize: state.scratchPaint.penMode.smoothingSize,
+    rectRoundedCornerSize: state.scratchPaint.rectMode.roundedCornerSize,
+    roundedRectRoundedCornerSize: state.scratchPaint.roundedRectMode.roundedCornerSize,
+    freeformSmoothingSize: state.scratchPaint.freeformMode.smoothingSize,
+    triangleSideCount: state.scratchPaint.triangleMode.triangleSideCount,
+    triangleSpokeRatio: state.scratchPaint.triangleMode.triangleSpokeRatio,
+    shapeModeShape: state.scratchPaint.shapeMode.shape,
+    clipboardItems: state.scratchPaint.clipboard.items,
 });
 const mapDispatchToProps = dispatch => ({
     onBrushSliderChange: brushSize => {
         dispatch(changeBrushSize(brushSize));
     },
-    onSimplifySliderChange: brushSize => {
-        dispatch(changeSimplifySize(brushSize));
+    onSmoothingSliderChange: brushSize => {
+        dispatch(changeBrushSmoothingSize(brushSize));
     },
     onRoundedRectCornerSliderChange: roundedCornerSize => {
         dispatch(changeRoundedRectCornerSize(roundedCornerSize));
@@ -1060,14 +1061,14 @@ const mapDispatchToProps = dispatch => ({
     onEraserSliderChange: eraserSize => {
         dispatch(changeEraserSize(eraserSize));
     },
-    onEraserSimplifySliderChange: eraserSize => {
-        dispatch(changeEraserSimplifySize(eraserSize));
+    onEraserSmoothingSliderChange: eraserSize => {
+        dispatch(changeEraserSmoothingSize(eraserSize));
     },
     onBrushChange: type => {
         dispatch(setBrushType(type));
     },
-    onPenSimplifySliderChange: eraserSize => {
-        dispatch(changePenSimplifySize(eraserSize));
+    onPenSmoothingSliderChange: eraserSize => {
+        dispatch(changePenSmoothingSize(eraserSize));
     },
     onFillShapes: () => {
         dispatch(setShapesFilled(true));

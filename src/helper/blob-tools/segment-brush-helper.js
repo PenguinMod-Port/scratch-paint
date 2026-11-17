@@ -132,7 +132,7 @@ class SegmentBrushHelper {
 
         // no need for normalization with the square brush
         if (this.isSquareBrush) {
-            if (options.simplifySize > 0 && this.finalPath.segments) this.finalPath.simplify(options.simplifySize);
+            if (options.smoothingSize > 0 && this.finalPath.segments) this.finalPath.simplify(options.smoothingSize);
             return this.finalPath;
         }
 
@@ -140,8 +140,8 @@ class SegmentBrushHelper {
         // paths tends to cut off the path.
         if (this.finalPath.segments && this.finalPath.segments.length > 4) {
             this.finalPath.closed = false;
-            if (options.simplifySize > 0) {
-                this.finalPath.simplify(options.simplifySize);
+            if (options.smoothingSize > 0) {
+                this.finalPath.simplify(options.smoothingSize);
             }
             this.finalPath.closed = true;
             // Merge again with the first point, since it gets distorted when we unclose the path.

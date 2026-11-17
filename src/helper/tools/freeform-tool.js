@@ -37,7 +37,7 @@ class FreeformTool extends paper.Tool {
 
         this.fixedDistance = 2;
         /** Smaller numbers match the line more closely, larger numbers for smoother curves */
-        this.simplifySize = 2;
+        this.smoothingSize = 2;
 
         /** Whether the outline is empty */
         // For lasso fill art where you might draw a lot of these over each other
@@ -46,8 +46,8 @@ class FreeformTool extends paper.Tool {
     setColorState (colorState) {
         this.colorState = colorState;
     }
-    setSimplifySize (simplifySize) {
-        this.simplifySize = simplifySize;
+    setSmoothingSize (smoothingSize) {
+        this.smoothingSize = smoothingSize;
     }
     drawHitPoint (hitResult) {
         // If near another path's endpoint, draw hit point to indicate that paths would merge
@@ -158,8 +158,8 @@ class FreeformTool extends paper.Tool {
         const hasEndConnection = !!this.hitResult;
         this.path.removeSegments(this.subpathIndex);
         
-        if (this.simplifySize > 0) {
-            this.subpath.simplify(this.simplifySize);
+        if (this.smoothingSize > 0) {
+            this.subpath.simplify(this.smoothingSize);
         }
         if (hasStartConnection && this.subpath.length > 0) {
             this.subpath.removeSegment(0);

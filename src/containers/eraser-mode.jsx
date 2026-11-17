@@ -66,13 +66,13 @@ EraserMode.propTypes = {
     clearSelectedItems: PropTypes.func.isRequired,
     eraserModeState: PropTypes.shape({
         brushSize: PropTypes.number.isRequired,
-        simplifySize: PropTypes.number,
+        smoothingSize: PropTypes.number,
         brushType: "CIRCLE"
     }),
     /* used to extract brush type */
     brushModeState: PropTypes.shape({
         brushSize: PropTypes.number.isRequired,
-        simplifySize: PropTypes.number,
+        smoothingSize: PropTypes.number,
         brushType: "CIRCLE"
     }),
     handleMouseDown: PropTypes.func.isRequired,

@@ -107,7 +107,7 @@ class BroadBrushHelper {
         // Add an end cap if the mouse has changed direction very quickly
         if (this.lastVec) {
             const angle = this.lastVec.getDirectedAngle(step);
-            if (Math.abs(angle) > 126 && options.simplifySize > 0) {
+            if (Math.abs(angle) > 126 && options.smoothingSize > 0) {
                 // This will cause us to skip simplifying this sharp angle. Running simplify on
                 // sharp angles causes the stroke to blob outwards.
                 this.simplify(1);
@@ -166,9 +166,9 @@ class BroadBrushHelper {
         this.finalPath.add(point.add(step));
         this.finalPath.insert(0, point.subtract(step));
 
-        if (options.simplifySize > 0) {
+        if (options.smoothingSize > 0) {
             if (this.finalPath.segments.length > this.smoothed + (this.smoothingThreshold * 2)) {
-                this.simplify(options.simplifySize);
+                this.simplify(options.smoothingSize);
             }
         }
 
@@ -253,7 +253,7 @@ class BroadBrushHelper {
 
         // no need for normalization with the square brush
         if (this.isSquareBrush) {
-            if (options.simplifySize > 0 && this.finalPath.segments) this.simplify(options.simplifySize);
+            if (options.smoothingSize > 0 && this.finalPath.segments) this.simplify(options.smoothingSize);
             return this.finalPath;
         }
 
@@ -289,7 +289,7 @@ class BroadBrushHelper {
         }
 
         // Simplify before adding end cap so cap doesn't get warped
-        if (options.simplifySize > 0) {
+        if (options.smoothingSize > 0) {
             this.simplify(1);
         }
         const handleVec = delta.normalize(options.brushSize / 2);
