@@ -84,7 +84,7 @@ const messages = defineMessages({
     freeform: {
         defaultMessage: 'Freeform',
         description: 'Label for the freeform tool',
-        id: 'pm.paint.FreeformMode.freeform'
+        id: 'pm.paint.freeformMode.freeform'
     }
 });
 
