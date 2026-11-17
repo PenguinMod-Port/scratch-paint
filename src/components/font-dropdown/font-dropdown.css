@@ -21,12 +21,16 @@
 }
 
 .mod-context-menu {
-    display: flex;
-    flex-direction: column;
-}
-.font-context-menu {
+    /* NOTE: use enterExitTransitionDurationMs to tell if the max-height is bad when animating */
+    min-height: 2rem;
+    max-height: calc(100vh - 13.5rem);
+
     display: grid;
     grid-template-columns: auto auto auto;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .mod-unselect {
