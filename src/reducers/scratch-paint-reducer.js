@@ -8,7 +8,7 @@ import eraserModeReducer from './eraser-mode';
 import rectModeReducer from './rect-mode';
 import roundedRectModeReducer from './rounded-rect-mode';
 import triangleModeReducer from './triangle-mode';
-import sussyModeReducer from './sussy-mode';
+import shapeModeReducer from './shape-mode';
 import colorReducer from './color';
 import clipboardReducer from './clipboard';
 import cursorReducer from './cursor';
@@ -46,7 +46,7 @@ export default combineReducers({
     rectMode: rectModeReducer,
     roundedRectMode: roundedRectModeReducer,
     triangleMode: triangleModeReducer,
-    sussyMode: sussyModeReducer,
+    shapeMode: shapeModeReducer,
     fillBitmapShapes: fillBitmapShapesReducer,
     fillMode: fillModeReducer,
     font: fontReducer,

@@ -3,23 +3,23 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import bindAll from 'lodash.bindall';
-import Modes from '../lib/modes';
-import { MIXED } from '../helper/style-path';
-import ColorStyleProptype from '../lib/color-style-proptype';
-import GradientTypes from '../lib/gradient-types';
+import Modes from '../lib/modes.js';
+import { MIXED } from '../helper/style-path.js';
+import ColorStyleProptype from '../lib/color-style-proptype.js';
+import GradientTypes from '../lib/gradient-types.js';
 
-import { changeFillColor, clearFillGradient, DEFAULT_COLOR } from '../reducers/fill-style';
-import { changeStrokeColor, clearStrokeGradient } from '../reducers/stroke-style';
-import { changeMode } from '../reducers/modes';
-import { clearSelectedItems, setSelectedItems } from '../reducers/selected-items';
-import { setCursor } from '../reducers/cursor';
-import { changeCurrentlySelectedShape } from '../reducers/sussy-mode';
+import { changeFillColor, clearFillGradient, DEFAULT_COLOR } from '../reducers/fill-style.js';
+import { changeStrokeColor, clearStrokeGradient } from '../reducers/stroke-style.js';
+import { changeMode } from '../reducers/modes.js';
+import { clearSelectedItems, setSelectedItems } from '../reducers/selected-items.js';
+import { setCursor } from '../reducers/cursor.js';
+import { changeCurrentlySelectedShape } from '../reducers/shape-mode.js';
 
-import { clearSelection, getSelectedLeafItems } from '../helper/selection';
-import SussyTool from '../helper/tools/sussy-tool';
-import SussyModeComponent from '../components/sussy-mode/sussy-mode.jsx';
+import { clearSelection, getSelectedLeafItems } from '../helper/selection.js';
+import ShapeTool from '../helper/tools/shape-tool.js';
+import ShapeModeComponent from '../components/shape-mode/shape-mode.jsx';
 
-class SussyMode extends React.Component {
+class ShapeMode extends React.Component {
     constructor(props) {
         super(props);
         bindAll(this, [
@@ -29,7 +29,7 @@ class SussyMode extends React.Component {
         ]);
     }
     componentDidMount() {
-        if (this.props.isSussyModeActive) {
+        if (this.props.isShapeModeActive) {
             this.activateTool(this.props);
         }
     }
@@ -44,14 +44,14 @@ class SussyMode extends React.Component {
             this.tool.setShape(nextProps.shape);
         }
 
-        if (nextProps.isSussyModeActive && !this.props.isSussyModeActive) {
+        if (nextProps.isShapeModeActive && !this.props.isShapeModeActive) {
             this.activateTool();
-        } else if (!nextProps.isSussyModeActive && this.props.isSussyModeActive) {
+        } else if (!nextProps.isShapeModeActive && this.props.isShapeModeActive) {
             this.deactivateTool();
         }
     }
     shouldComponentUpdate(nextProps) {
-        return nextProps.isSussyModeActive !== this.props.isSussyModeActive;
+        return nextProps.isShapeModeActive !== this.props.isShapeModeActive;
     }
     componentWillUnmount() {
         if (this.tool) {
@@ -66,7 +66,7 @@ class SussyMode extends React.Component {
             this.props.onSetSelectedShape("smile");
         }
 
-        this.tool = new SussyTool(
+        this.tool = new ShapeTool(
             this.props.setSelectedItems,
             this.props.clearSelectedItems,
             this.props.setCursor,
@@ -128,15 +128,15 @@ class SussyMode extends React.Component {
     }
     render() {
         return (
-            <SussyModeComponent
-                isSelected={this.props.isSussyModeActive}
+            <ShapeModeComponent
+                isSelected={this.props.isShapeModeActive}
                 onMouseDown={this.props.handleMouseDown}
             />
         );
     }
 }
 
-SussyMode.propTypes = {
+ShapeMode.propTypes = {
     clearFillGradient: PropTypes.func.isRequired,
     clearStrokeGradient: PropTypes.func.isRequired,
     clearSelectedItems: PropTypes.func.isRequired,
@@ -147,7 +147,7 @@ SussyMode.propTypes = {
     }).isRequired,
     shape: PropTypes.string.isRequired,
     handleMouseDown: PropTypes.func.isRequired,
-    isSussyModeActive: PropTypes.bool.isRequired,
+    isShapeModeActive: PropTypes.bool.isRequired,
     onChangeFillColor: PropTypes.func.isRequired,
     onChangeStrokeColor: PropTypes.func.isRequired,
     onSetSelectedShape: PropTypes.func.isRequired,
@@ -159,9 +159,9 @@ SussyMode.propTypes = {
 
 const mapStateToProps = state => ({
     colorState: state.scratchPaint.color,
-    isSussyModeActive: state.scratchPaint.mode === Modes.SUSSY,
+    isShapeModeActive: state.scratchPaint.mode === Modes.SHAPE,
     selectedItems: state.scratchPaint.selectedItems,
-    shape: state.scratchPaint.sussyMode.shape,
+    shape: state.scratchPaint.shapeMode.shape,
 });
 const mapDispatchToProps = dispatch => ({
     clearSelectedItems: () => {
@@ -180,7 +180,7 @@ const mapDispatchToProps = dispatch => ({
         dispatch(setCursor(cursorString));
     },
     handleMouseDown: () => {
-        dispatch(changeMode(Modes.SUSSY));
+        dispatch(changeMode(Modes.SHAPE));
     },
     onChangeFillColor: fillColor => {
         dispatch(changeFillColor(fillColor));
@@ -196,4 +196,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(SussyMode);
+)(ShapeMode);

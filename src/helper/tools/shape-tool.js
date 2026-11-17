@@ -8,9 +8,9 @@ import NudgeTool from '../selection-tools/nudge-tool';
 import { selectablePaths } from '../selectable-shapes';
 
 /**
- * Tool for drawing sussys.
+ * Tool for drawing shapes.
  */
-class SussyTool extends paper.Tool {
+class ShapeTool extends paper.Tool {
     static get TOLERANCE() {
         return 2;
     }
@@ -26,13 +26,13 @@ class SussyTool extends paper.Tool {
         this.clearSelectedItems = clearSelectedItems;
         this.onUpdateImage = onUpdateImage;
         this.boundingBoxTool = new BoundingBoxTool(
-            Modes.SUSSY,
+            Modes.SHAPE,
             setSelectedItems,
             clearSelectedItems,
             setCursor,
             onUpdateImage
         );
-        const nudgeTool = new NudgeTool(Modes.SUSSY, this.boundingBoxTool, onUpdateImage);
+        const nudgeTool = new NudgeTool(Modes.SHAPE, this.boundingBoxTool, onUpdateImage);
 
         // We have to set these functions instead of just declaring them because
         // paper.js tools hook up the listeners in the setter functions.
@@ -43,7 +43,7 @@ class SussyTool extends paper.Tool {
         this.onKeyUp = nudgeTool.onKeyUp;
         this.onKeyDown = nudgeTool.onKeyDown;
 
-        this.sussy = null;
+        this.path = null;
         this.colorState = null;
         this.isBoundingBoxMode = null;
         this.active = false;
@@ -60,7 +60,7 @@ class SussyTool extends paper.Tool {
             match: hitResult =>
                 (hitResult.item.data && (hitResult.item.data.isScaleHandle || hitResult.item.data.isRotHandle)) ||
                 hitResult.item.selected, // Allow hits on bounding box and selected only
-            tolerance: SussyTool.TOLERANCE / paper.view.zoom
+            tolerance: ShapeTool.TOLERANCE / paper.view.zoom
         };
     }
     /**
@@ -97,13 +97,13 @@ class SussyTool extends paper.Tool {
             return;
         }
 
-        if (this.sussy) this.sussy.remove();
+        if (this.path) this.path.remove();
 
         const rawBounds = new paper.Rectangle(event.downPoint, event.point);
         const pathData = selectablePaths[this.shape];
-        this.sussy = new paper.CompoundPath(pathData);
+        this.path = new paper.CompoundPath(pathData);
 
-        const shapeBounds = this.sussy.bounds.clone();
+        const shapeBounds = this.path.bounds.clone();
         const shapeRatio = shapeBounds.width / shapeBounds.height;
         let finalBounds = rawBounds;
 
@@ -128,11 +128,11 @@ class SussyTool extends paper.Tool {
             );
         }
 
-        this.sussy.bounds = finalBounds;
-        if (event.modifiers.alt) this.sussy.position = event.downPoint;
-        else this.sussy.position = this.sussy.bounds.center;
+        this.path.bounds = finalBounds;
+        if (event.modifiers.alt) this.path.position = event.downPoint;
+        else this.path.position = this.path.bounds.center;
 
-        styleShape(this.sussy, this.colorState);
+        styleShape(this.path, this.colorState);
     }
     handleMouseUp(event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
@@ -143,16 +143,16 @@ class SussyTool extends paper.Tool {
             return;
         }
 
-        if (this.sussy) {
-            if (Math.abs(this.sussy.area) < SussyTool.TOLERANCE / paper.view.zoom) {
-                // Tiny sussy created unintentionally?
-                this.sussy.remove();
-                this.sussy = null;
+        if (this.path) {
+            if (Math.abs(this.path.area) < ShapeTool.TOLERANCE / paper.view.zoom) {
+                // Tiny path created unintentionally?
+                this.path.remove();
+                this.path = null;
             } else {
-                this.sussy.selected = true;
+                this.path.selected = true;
                 this.setSelectedItems();
                 this.onUpdateImage();
-                this.sussy = null;
+                this.path = null;
             }
         }
         this.active = false;
@@ -165,4 +165,4 @@ class SussyTool extends paper.Tool {
     }
 }
 
-export default SussyTool;
+export default ShapeTool;

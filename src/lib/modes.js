@@ -14,7 +14,7 @@ const vectorModesObj = {
     RECT: null,
     ROUNDED_RECT: null,
     TEXT: null,
-    SUSSY: null,
+    SHAPE: null,
     TRIANGLE: null,
     ARROW: null,
     FREEFORM: null,
@@ -52,7 +52,7 @@ const GradientToolsModes = keyMirror({
     BIT_FILL: null,
 
     TEXT: null,
-    SUSSY: null,
+    SHAPE: null,
     TRIANGLE: null,
     ARROW: null
 });

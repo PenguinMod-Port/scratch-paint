@@ -31,7 +31,7 @@ import OvalMode from '../../containers/oval-mode.jsx';
 import PenMode from '../../containers/pen-mode.jsx';
 import RectMode from '../../containers/rect-mode.jsx';
 import RoundedRectMode from '../../containers/rounded-rect-mode.jsx';
-import SussyMode from '../../containers/sussy-mode.jsx';
+import ShapeMode from '../../containers/shape-mode.jsx';
 import TriangleMode from '../../containers/triangle-mode.jsx';
 import ArrowMode from '../../containers/arrow-mode.jsx';
 import ReshapeMode from '../../containers/reshape-mode.jsx';
@@ -254,7 +254,7 @@ const PaintEditorComponent = props => (
                     <TriangleMode
                         onUpdateImage={props.onUpdateImage}
                     />
-                    <SussyMode
+                    <ShapeMode
                         onUpdateImage={props.onUpdateImage}
                     />
                     <ArrowMode

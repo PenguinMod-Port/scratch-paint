@@ -56,7 +56,7 @@ const messages = defineMessages({
         description: 'Label for the text tool',
         id: 'paint.textMode.text'
     },
-    sussy: {
+    shape: {
         defaultMessage: 'Shapes',
         description: 'Label for the shape tool',
         id: 'pm.paint.shapeMode.shape'

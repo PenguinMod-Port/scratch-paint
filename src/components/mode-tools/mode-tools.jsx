@@ -10,7 +10,7 @@ import {changeSimplifySize as changePenSimplifySize} from '../../reducers/pen-mo
 import {changeRoundedRectCornerSize} from '../../reducers/rounded-rect-mode';
 import {changeRoundedCornerSize} from '../../reducers/rect-mode';
 import {changeTrianglePolyCount, changeTrianglePointCount} from '../../reducers/triangle-mode';
-import {changeCurrentlySelectedShape} from '../../reducers/sussy-mode';
+import {changeCurrentlySelectedShape} from '../../reducers/shape-mode';
 import {changeBitBrushSize} from '../../reducers/bit-brush-size';
 import {changeBitEraserSize} from '../../reducers/bit-eraser-size';
 import {setShapesFilled} from '../../reducers/fill-bitmap-shapes';
@@ -34,10 +34,10 @@ import Formats, {isBitmap, isVector} from '../../lib/format';
 import {hideLabel} from '../../lib/hide-label';
 import styles from './mode-tools.css';
 import {
-    selectableShapes as sussyToolShapes,
-    categories as sussyToolCategories,
-    generateShapeSVG as generateSussyShapeSVG,
-    categorizeShapes as categorizeSussyShapes,
+    selectableShapes as shapeToolShapes,
+    categories as shapeToolCategories,
+    generateShapeSVG as generateShapeToolSVG,
+    categorizeShapes as categorizeShapeToolShapes,
 } from '../../helper/selectable-shapes.js';
 
 import copyIcon from '!../../tw-recolor/build!./icons/copy.svg';
@@ -520,13 +520,13 @@ const ModeToolsComponent = props => {
                     </div>
                 );
             }
-        case Modes.SUSSY:
+        case Modes.SHAPE:
             {
                 const currentlySelectedShape = props.currentlySelectedShape;
                 const changeFunction = props.onCurrentlySelectedShapeChange;
-                const selectedShapeObject = sussyToolShapes
+                const selectedShapeObject = shapeToolShapes
                     .filter(shape => shape.id === currentlySelectedShape)[0];
-                const categorizedShapes = categorizeSussyShapes(sussyToolShapes);
+                const categorizedShapes = categorizeShapeToolShapes(shapeToolShapes);
                 const selectableShapesList = (
                     <InputGroup
                         className={classNames(
@@ -538,14 +538,14 @@ const ModeToolsComponent = props => {
                         {Object.keys(categorizedShapes).map(categoryId => categorizedShapes[categoryId].length === 0 ?
                             (<React.Fragment key={categoryId} />) : (<React.Fragment key={categoryId}>
                                 <p className={classNames(styles.dropItemShapeToolLabel)}>
-                                    {sussyToolCategories[categoryId]}
+                                    {shapeToolCategories[categoryId]}
                                 </p>
                                 {categorizedShapes[categoryId].map(shape => (
                                     <LabeledIconButton
                                         key={shape.id}
                                         className={classNames(styles.dropItemShapeTool)}
                                         hideLabel={hideLabel(props.intl.locale)}
-                                        imgSrc={`data:image/svg+xml,${encodeURIComponent(generateSussyShapeSVG(shape))}`}
+                                        imgSrc={`data:image/svg+xml,${encodeURIComponent(generateShapeToolSVG(shape))}`}
                                         title={shape.name}
                                         onClick={() => changeFunction(shape.id)}
                                     />
@@ -569,7 +569,7 @@ const ModeToolsComponent = props => {
                             tipSize={.01}
                         >
                             <img
-                                src={`data:image/svg+xml,${encodeURIComponent(generateSussyShapeSVG(selectedShapeObject))}`}
+                                src={`data:image/svg+xml,${encodeURIComponent(generateShapeToolSVG(selectedShapeObject))}`}
                                 alt={selectedShapeObject.name}
                                 title={selectedShapeObject.name}
                                 height={16}
@@ -1021,7 +1021,7 @@ const mapStateToProps = state => ({
     roundedCornerValue: state.scratchPaint.rectMode.roundedCornerSize,
     trianglePolyValue: state.scratchPaint.triangleMode.trianglePolyCount,
     trianglePointValue: state.scratchPaint.triangleMode.trianglePointCount,
-    currentlySelectedShape: state.scratchPaint.sussyMode.shape,
+    currentlySelectedShape: state.scratchPaint.shapeMode.shape,
     brushPressure: state.scratchPaint.brushMode.pressureEnabled,
     clipboardItems: state.scratchPaint.clipboard.items,
     freeformValue: state.scratchPaint.freeformMode.simplifySize,
