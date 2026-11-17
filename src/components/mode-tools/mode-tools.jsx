@@ -9,7 +9,7 @@ import {changeBrushSize as changeEraserSize, changeSmoothingSize as changeEraser
 import {changeRoundedCornerSize} from '../../reducers/rect-mode';
 import {changeRoundedRectCornerSize} from '../../reducers/rounded-rect-mode';
 import {changeSideCount, changeSpokeRatio} from '../../reducers/triangle-mode';
-import {changeCurrentlySelectedShape} from '../../reducers/shape-mode';
+import {changeShape} from '../../reducers/shape-mode';
 import {changeBitBrushSize} from '../../reducers/bit-brush-size';
 import {changeBitEraserSize} from '../../reducers/bit-eraser-size';
 import {setShapesFilled} from '../../reducers/fill-bitmap-shapes';
@@ -516,8 +516,8 @@ const ModeToolsComponent = props => {
             }
         case Modes.SHAPE:
             {
-                const currentlySelectedShape = props.currentlySelectedShape;
-                const changeFunction = props.onCurrentlySelectedShapeChange;
+                const currentlySelectedShape = props.shapeModeShape;
+                const changeFunction = props.onShapeModeShapeChange;
                 const selectedShapeObject = shapeToolShapes
                     .filter(shape => shape.id === currentlySelectedShape)[0];
                 const categorizedShapes = categorizeShapeToolShapes(shapeToolShapes);
@@ -939,9 +939,9 @@ ModeToolsComponent.propTypes = {
     brushType: PropTypes.string,
     roundedCornerValue: PropTypes.number,
     roundedRectCornerValue: PropTypes.number,
-    trianglePolyValue: PropTypes.number,
-    trianglePointValue: PropTypes.number,
-    currentlySelectedShape: PropTypes.string,
+    triangleSideCount: PropTypes.number,
+    triangleSpokeRatio: PropTypes.number,
+    shapeModeShape: PropTypes.string,
     fillBitmapShapes: PropTypes.bool,
     format: PropTypes.oneOf(Object.keys(Formats)),
     hasSelectedUncurvedPoints: PropTypes.bool,
@@ -1017,8 +1017,8 @@ const mapDispatchToProps = dispatch => ({
     onTriangleSpokeRatioSliderChange: spokeRatio => {
         dispatch(changeSpokeRatio(spokeRatio));
     },
-    onCurrentlySelectedShapeChange: shape => {
-        dispatch(changeCurrentlySelectedShape(shape));
+    onShapeModeShapeChange: shape => {
+        dispatch(changeShape(shape));
     },
     onBrushPressureClick: () => {
         dispatch(toggleBrushPressure());

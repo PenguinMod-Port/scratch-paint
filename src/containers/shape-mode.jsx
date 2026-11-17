@@ -13,7 +13,7 @@ import { changeStrokeColor, clearStrokeGradient } from '../reducers/stroke-style
 import { changeMode } from '../reducers/modes.js';
 import { clearSelectedItems, setSelectedItems } from '../reducers/selected-items.js';
 import { setCursor } from '../reducers/cursor.js';
-import { changeCurrentlySelectedShape } from '../reducers/shape-mode.js';
+import { changeShape } from '../reducers/shape-mode.js';
 
 import { clearSelection, getSelectedLeafItems } from '../helper/selection.js';
 import ShapeTool from '../helper/tools/shape-tool.js';
@@ -189,7 +189,7 @@ const mapDispatchToProps = dispatch => ({
         dispatch(changeStrokeColor(strokeColor));
     },
     onSetSelectedShape: shape => {
-        dispatch(changeCurrentlySelectedShape(shape));
+        dispatch(changeShape(shape));
     }
 });
 
