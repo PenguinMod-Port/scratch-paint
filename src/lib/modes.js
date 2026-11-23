@@ -3,7 +3,6 @@ import keyMirror from 'keymirror';
 const vectorModesObj = {
     BRUSH: null,
     ERASER: null,
-    PEN: null,
     LINE: null,
     FILL: null,
     SELECT: null,
@@ -14,7 +13,7 @@ const vectorModesObj = {
     RECT: null,
     ROUNDED_RECT: null,
     TEXT: null,
-    SUSSY: null,
+    SHAPE: null,
     TRIANGLE: null,
     ARROW: null,
     FREEFORM: null,
@@ -52,7 +51,7 @@ const GradientToolsModes = keyMirror({
     BIT_FILL: null,
 
     TEXT: null,
-    SUSSY: null,
+    SHAPE: null,
     TRIANGLE: null,
     ARROW: null
 });

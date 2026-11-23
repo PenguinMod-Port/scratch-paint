@@ -173,7 +173,17 @@ const pan = (dx, dy) => {
  * @returns {paper.Rectangle} the bounds within which mouse events should work in the paint editor
  */
 const getActionBounds = isBitmap => {
-    return paper.view.bounds.unite(ART_BOARD_BOUNDS).intersect(MAX_WORKSPACE_BOUNDS);
+    if (isBitmap) {
+        return ART_BOARD_BOUNDS;
+    }
+    // TODO: This should be an editor setting i think? this makes the nudge tool & such escape past the larger bounds in the port, which people might not like
+    // i officially HATE the paper repo more than i hate the blockly repo now
+    return {
+        left: -Infinity,
+        right: Infinity,
+        top: -Infinity,
+        bottom: Infinity
+    };
 };
 
 const zoomToFit = isBitmap => {

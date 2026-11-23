@@ -38,8 +38,8 @@ const messages = defineMessages({
     },
     roundedRect: {
         defaultMessage: 'Rounded Rectangle',
-        description: 'Label for the rounded rectangle tool',
-        id: 'pm.paint.roundedRectMode.roundedRect'
+        description: 'Label for the rounded rectangle tool, which can be enabled with a setting',
+        id: 'paint.roundedRectMode.roundedRect'
     },
     select: {
         defaultMessage: 'Select',
@@ -51,7 +51,7 @@ const messages = defineMessages({
         description: 'Label for the text tool',
         id: 'paint.textMode.text'
     },
-    sussy: {
+    shape: {
         defaultMessage: 'Shapes',
         description: 'Label for the shape tool',
         id: 'pm.paint.shapeMode.shape'
@@ -79,7 +79,7 @@ const messages = defineMessages({
     freeform: {
         defaultMessage: 'Freeform',
         description: 'Label for the freeform tool',
-        id: 'pm.paint.FreeformMode.freeform'
+        id: 'pm.paint.freeformMode.freeform'
     }
 });
 

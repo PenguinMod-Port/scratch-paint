@@ -1,5 +1,6 @@
 import paper from '@turbowarp/paper';
 import classNames from 'classnames';
+import { connect } from 'react-redux';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -28,6 +29,10 @@ import FixedToolsContainer from '../../containers/fixed-tools.jsx';
 import ModeToolsContainer from '../../containers/mode-tools.jsx';
 import OvalMode from '../../containers/oval-mode.jsx';
 import RectMode from '../../containers/rect-mode.jsx';
+import RoundedRectMode from '../../containers/rounded-rect-mode.jsx';
+import ShapeMode from '../../containers/shape-mode.jsx';
+import TriangleMode from '../../containers/triangle-mode.jsx';
+import ArrowMode from '../../containers/arrow-mode.jsx';
 import ReshapeMode from '../../containers/reshape-mode.jsx';
 import SelectMode from '../../containers/select-mode.jsx';
 import LassoMode from '../../containers/lasso-mode.jsx';
@@ -139,6 +144,8 @@ const PaintEditorComponent = props => (
                         <InputGroup className={styles.modModeTools}>
                             <ModeToolsContainer
                                 onUpdateImage={props.onUpdateImage}
+                                width={props.width}
+                                height={props.height}
                                 onManageFonts={props.onManageFonts}
                             />
                         </InputGroup>
@@ -161,6 +168,8 @@ const PaintEditorComponent = props => (
                             <InputGroup className={styles.modModeTools}>
                                 <ModeToolsContainer
                                     onUpdateImage={props.onUpdateImage}
+                                    width={props.width}
+                                    height={props.height}
                                     onManageFonts={props.onManageFonts}
                                 />
                             </InputGroup>
@@ -232,6 +241,20 @@ const PaintEditorComponent = props => (
                             Modes.RECT,
                             Modes.OVAL
                         ]}
+                    />
+                    {props.showRoundedRectMode && (
+                        <RoundedRectMode
+                            onUpdateImage={props.onUpdateImage}
+                        />
+                    )}
+                    <TriangleMode
+                        onUpdateImage={props.onUpdateImage}
+                    />
+                    <ShapeMode
+                        onUpdateImage={props.onUpdateImage}
+                    />
+                    <ArrowMode
+                        onUpdateImage={props.onUpdateImage}
                     />
                 </div>
             ) : null}
@@ -462,10 +485,18 @@ PaintEditorComponent.propTypes = {
     rtl: PropTypes.bool,
     setCanvas: PropTypes.func.isRequired,
     setTextArea: PropTypes.func.isRequired,
+    showRoundedRectMode: PropTypes.bool,
     textArea: PropTypes.instanceOf(Element),
     theme: PropTypes.string,
     width: PropTypes.number,
+    height: PropTypes.number,
     zoomLevelId: PropTypes.string
 };
 
-export default injectIntl(PaintEditorComponent);
+const mapStateToProps = state => ({
+    showRoundedRectMode: state.scratchPaint.addonUtil.showRoundedRectMode
+});
+
+export default connect(
+    mapStateToProps,
+)(injectIntl(PaintEditorComponent));
