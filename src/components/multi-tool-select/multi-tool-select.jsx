@@ -13,7 +13,7 @@ class MultiToolSelectComponent extends React.Component {
     }
 
     render() {
-        if (this.props.settingsStore && this.props.settingsStore.store.paintMultiTool === false){
+        if (this.props.settingsStore && this.props.settingsStore.paintMultiTool === false){
             return (<React.Fragment>{this.props.tools}</React.Fragment>);
         }
 

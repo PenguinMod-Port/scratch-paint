@@ -134,7 +134,7 @@ class ScrollableCanvas extends React.Component {
         // Multiplier variable, so that non-pixel-deltaModes are supported. Needed for Firefox.
         // See #529 (or LLK/scratch-blocks#1190).
         let multiplier = event.deltaMode === 0x1 ? 15 : 1;
-        if (this.props.settingsStore) multiplier *= this.props.settingsStore.store.paintScrollZoom / 100;
+        if (this.props.settingsStore) multiplier *= this.props.settingsStore.paintScrollZoom / 100;
         const deltaX = event.deltaX * multiplier;
         const deltaY = event.deltaY * multiplier;
         const canvasRect = this.props.canvas.getBoundingClientRect();

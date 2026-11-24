@@ -129,6 +129,9 @@ class PaintEditor extends React.Component {
         if (this.props.customFonts !== newProps.customFonts) {
             this.props.onCustomFontsChanged(newProps.customFonts);
         }
+        if (this.props.settingsStore !== newProps.settingsStore) {
+            this.props.onSettingsStoreChanged(newProps.settingsStore);
+        }
     }
     componentDidUpdate (prevProps) {
         if (this.props.isEyeDropping && !prevProps.isEyeDropping) {

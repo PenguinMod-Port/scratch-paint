@@ -109,14 +109,14 @@ class PaperCanvas extends React.Component {
         paper.remove();
     }
     handlePointerDown (event) {
-        if (event.pointerType === 'pen' && (!this.props.settingsStore || this.props.settingsStore.store.paintPenPressure === true)) {
+        if (event.pointerType === 'pen' && (!this.props.settingsStore || this.props.settingsStore.paintPenPressure === true)) {
             setPenPressure(event.pressure);
         } else {
             setPenPressure(null);
         }
     }
     handlePointerMove (event) {
-        if (event.pointerType === 'pen' && (!this.props.settingsStore || this.props.settingsStore.store.paintPenPressure === true)) {
+        if (event.pointerType === 'pen' && (!this.props.settingsStore || this.props.settingsStore.paintPenPressure === true)) {
             setPenPressure(event.pressure);
         } else {
             setPenPressure(null);
