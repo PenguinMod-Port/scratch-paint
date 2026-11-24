@@ -1,4 +1,4 @@
-const SET_SETTINGS_STORE = 'scratch-paint/modes/SET_SETTINGS_STORE';
+const SET_SETTINGS_STORE = 'scratch-paint/editor-settings/SET_SETTINGS_STORE';
 const initialState = null;
 
 const reducer = function (state, action) {
